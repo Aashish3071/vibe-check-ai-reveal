@@ -137,11 +137,11 @@ const Index = () => {
       <main className="flex flex-col flex-1 w-full justify-center items-center relative z-10">
         <div className="w-full px-4">
           <div className="text-center mt-10 mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold mb-2 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200">
+            <h1 className="text-xl sm:text-2xl mb-3 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200">
               Your Digital BFF for Love Insights & Emotional Growth
               <span className="ml-2 text-xl align-top animate-bounce">✨</span>
             </h1>
-            <p className="text-xl text-purple-600 dark:text-pink-300 font-medium">
+            <p className="text-xl text-purple-600 dark:text-pink-300">
               Ready to spill the tea?
             </p>
           </div>

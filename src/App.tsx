@@ -7,19 +7,25 @@ import { ThemeProvider } from "./hooks/use-theme";
 import { useIsAuthenticated } from "./lib/auth";
 import { useIsOnboardingComplete, useAppMode } from "./lib/appMode";
 
+// Shared Pages
 import Index from "./pages/Index";
-import DecodeVibe from "./pages/DecodeVibe";
-import IntentDetectorPage from "./pages/IntentDetectorPage";
-import PatternRecognizer from "./pages/PatternRecognizer";
-import TarotMode from "./pages/TarotMode";
-import Journal from "./pages/Journal";
-import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Quiz from "./pages/Quiz";
-import Analyze from "./pages/Analyze";
-import MoodCheckPage from "./pages/MoodCheckPage";
+import NotFound from "./pages/NotFound";
+import Journal from "./pages/Journal";
 
+// Layout
 import LayoutSwitcher from "./components/LayoutSwitcher";
+
+// Dating Bestie Pages and Components
+import DecodeVibe from "./features/bestie/pages/DecodeVibe";
+import IntentDetectorPage from "./features/bestie/pages/IntentDetectorPage";
+import PatternRecognizer from "./features/bestie/pages/PatternRecognizer";
+import TarotMode from "./features/bestie/pages/TarotMode";
+import Analyze from "./features/bestie/pages/Analyze";
+
+// Therapist Bestie Pages and Components
+import MoodCheckPage from "./features/therapist/pages/MoodCheckPage";
 
 // Placeholder components for remaining therapist mode features
 const SelfCoaching = () => (
@@ -58,8 +64,12 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
   const hasCompletedOnboarding = useIsOnboardingComplete();
   const { mode } = useAppMode();
 
+  console.log("QuizRoute - isAuthenticated:", isAuthenticated);
+  console.log("QuizRoute - hasCompletedOnboarding:", hasCompletedOnboarding);
+
   // If already onboarded, redirect to the appropriate dashboard based on mode
   if (isAuthenticated && hasCompletedOnboarding) {
+    console.log("QuizRoute - Redirecting to dashboard");
     // User has already completed onboarding, send to appropriate dashboard
     return (
       <Navigate
@@ -71,9 +81,11 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {
+    console.log("QuizRoute - Redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
+  console.log("QuizRoute - Showing quiz");
   // Show the quiz with showNavigation=false
   return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
 };
