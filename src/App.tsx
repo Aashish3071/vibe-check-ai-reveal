@@ -13,6 +13,8 @@ import PatternRecognizer from "./pages/PatternRecognizer";
 import TarotMode from "./pages/TarotMode";
 import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import Quiz from "./pages/Quiz";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/quiz" element={<Quiz />} />
             <Route path="/decode-vibe" element={<DecodeVibe />} />
             <Route path="/intent-detector" element={<IntentDetectorPage />} />
             <Route path="/pattern-recognizer" element={<PatternRecognizer />} />
