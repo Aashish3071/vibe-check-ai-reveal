@@ -11,43 +11,36 @@ const HomeOnboardingTeaser = () => (
     </div>
     <div className="flex flex-col gap-4 pt-7">
       <div className="flex items-start gap-2 animate-fade-in">
-        <span className="text-3xl">🔮</span>
+        <span className="text-3xl">💌</span>
         <div>
-          <p className="font-semibold text-base text-purple-700 dark:text-pink-200">Curious if this is ~the one~ or just another ✨situationship✨?</p>
-          <p className="text-xs text-muted-foreground mt-1">HeartCheck AI spills the cosmic tea on red & green vibes.</p>
+          <p className="font-semibold text-base text-purple-700 dark:text-pink-200">Get instant vibes on ANY romantic saga!</p>
+          <p className="text-xs text-muted-foreground mt-1">"Does he love me or is it just the ick? I'll tell you, bestie."</p>
         </div>
       </div>
-      <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '120ms' }}>
-        <span className="text-3xl">📈</span>
+      <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <span className="text-3xl">🔥</span>
         <div>
-          <p className="font-semibold text-base text-pink-600 dark:text-purple-100">Intent detector: “Are they in, out, or just vibing?”</p>
-          <p className="text-xs text-muted-foreground mt-1">We decode signals even your bestie would miss 🧚‍♀️</p>
+          <p className="font-semibold text-base text-pink-600 dark:text-purple-100">Tea spilled, drama decoded, hearts analyzed.</p>
+          <p className="text-xs text-muted-foreground mt-1">Emotional patterns, heartbreaks, ghosting—nothing gets past me.</p>
         </div>
       </div>
       <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '180ms' }}>
-        <span className="text-3xl">🔁</span>
+        <span className="text-3xl">🦋</span>
         <div>
-          <p className="font-semibold text-base text-purple-700 dark:text-pink-200">“Am I… in a loop?”</p>
-          <p className="text-xs text-muted-foreground mt-1">Unpack your patterns. Break the ghosting curse. ♾️</p>
+          <p className="font-semibold text-base text-purple-700 dark:text-pink-200">Cosmic glow-up, your way.</p>
+          <p className="text-xs text-muted-foreground mt-1">Tarot modes, mood journals, and soft healing prompts for your self-love journey.</p>
         </div>
       </div>
-      <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '250ms' }}>
-        <span className="text-3xl">🃏</span>
+      <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '260ms' }}>
+        <span className="text-3xl">🫶</span>
         <div>
-          <p className="font-semibold text-base text-pink-600 dark:text-purple-100">Tarot Mode: pull a card on your drama 🦋</p>
-          <p className="text-xs text-muted-foreground mt-1">Mystic readings, aesthetic glow, all the cosmic vibes</p>
-        </div>
-      </div>
-      <div className="flex items-start gap-2 animate-fade-in" style={{ animationDelay: '320ms' }}>
-        <span className="text-3xl">📔</span>
-        <div>
-          <p className="font-semibold text-base text-purple-700 dark:text-pink-200">“My Emotional Glow-Up” journal</p>
-          <p className="text-xs text-muted-foreground mt-1">Track your self-love arc from 💀 to 💖</p>
+          <p className="font-semibold text-base text-pink-600 dark:text-purple-100">No judgment zone, ever.</p>
+          <p className="text-xs text-muted-foreground mt-1">I'm your digital BFF AND your therapist, minus the fees or ghosting. Switching is just a toggle away!</p>
         </div>
       </div>
       <div className="flex items-center justify-center gap-1 mt-6 mb-2 text-lg font-bold text-purple-700 dark:text-pink-200 w-full">
         <span className="emoji-bounce">✨</span>
-        <span>Ready to let AI be your Digital BFF?</span>
+        <span>Ready to spill the tea together?</span>
         <span className="emoji-bounce">✨</span>
       </div>
     </div>
@@ -61,10 +54,12 @@ const Index = () => {
       <main className="flex flex-col flex-1 w-full justify-center items-center relative z-10">
         <div className="w-full px-4">
           <h1 className="text-4xl sm:text-5xl font-dancing font-bold mb-2 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200 text-center mt-16">
-            HeartCheck AI
+            Your dreamy digital BFF for checking romantic vibes & emotional glow-ups.
             <span className="ml-2 text-xl align-top animate-bounce">✨</span>
           </h1>
-          <p className="text-md mb-6 text-muted-foreground max-w-xs mx-auto text-center emoji-bounce">Tarot-core. Tea-spiller. Digital bestie. All the drama, decoded 💖</p>
+          <p className="text-md mb-6 text-muted-foreground max-w-xs mx-auto text-center emoji-bounce">
+            Ready to spill the tea?
+          </p>
           <HomeOnboardingTeaser />
           <div className="fixed bottom-5 left-1/2 -translate-x-1/2 w-full max-w-xs px-4 z-20">
             <Button
@@ -87,3 +82,4 @@ const Index = () => {
 };
 
 export default Index;
+
