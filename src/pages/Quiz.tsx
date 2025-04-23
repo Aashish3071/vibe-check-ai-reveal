@@ -10,106 +10,115 @@ const quizSections = [
     title: "Vibe Check Basics",
     questions: [
       {
-        text: "How are you feeling today?",
+        key: "current_mood",
+        text: "How are you feeling today, bestie?",
         options: [
-          { label: "😫 Anxious", value: "anxious" },
-          { label: "😍 In love", value: "in-love" },
-          { label: "😐 Meh", value: "meh" },
-          { label: "🧘‍♀️ Chillin’", value: "chillin" },
-        ],
+          "😫 Anxious",
+          "😍 In love",
+          "😐 Meh",
+          "🧘‍♀️ Chillin’"
+        ]
       },
       {
+        key: "talking_to_someone",
         text: "Are you currently talking to someone?",
         options: [
-          { label: "Yes", value: "yes" },
-          { label: "Kinda", value: "kinda" },
-          { label: "No", value: "no" },
-          { label: "It’s complicated", value: "complicated" },
-        ],
+          "Yes",
+          "Kinda",
+          "No",
+          "It’s complicated"
+        ]
       },
       {
+        key: "relationship_goal",
         text: "What’s your relationship goal right now?",
         options: [
-          { label: "Just healing 🧘‍♀️", value: "healing" },
-          { label: "Looking for love 💘", value: "love" },
-          { label: "Situationship drama 😵‍💫", value: "drama" },
-          { label: "Self-growth era ✨", value: "self-growth" },
-        ],
-      },
-    ],
+          "Just healing 🧘‍♀️",
+          "Looking for love 💘",
+          "Situationship drama 😵‍💫",
+          "Self-growth era ✨"
+        ]
+      }
+    ]
   },
   {
     title: "Emotional Personality",
     questions: [
       {
-        text: "Pick your toxic trait 💀 (we all got one)",
+        key: "toxic_trait",
+        text: "Pick your toxic trait 💀 (no judgment, promise)",
         options: [
-          { label: "Ghosting", value: "ghosting" },
-          { label: "Love bombing", value: "love-bombing" },
-          { label: "Overthinking everything", value: "overthinking" },
-          { label: "Trust issues", value: "trust-issues" },
-        ],
+          "Ghosting",
+          "Love bombing",
+          "Overthinking everything",
+          "Trust issues"
+        ]
       },
       {
-        text: "How do you usually deal with conflict?",
+        key: "conflict_response",
+        text: "How do you deal with conflict?",
         options: [
-          { label: "Shut down 🧊", value: "shut-down" },
-          { label: "Talk it out 💬", value: "talk-it-out" },
-          { label: "Blow up 💥", value: "blow-up" },
-          { label: "Avoid it 😶", value: "avoid" },
-        ],
-      },
-    ],
+          "Shut down 🧊",
+          "Talk it out 💬",
+          "Blow up 💥",
+          "Avoid it 😶"
+        ]
+      }
+    ]
   },
   {
-    title: "Attachment Style (Quick Vibe-Based)",
+    title: "Attachment Style (Situational)",
     questions: [
       {
-        text: "What would you do if your crush left you on read for 24h?",
+        key: "reply_response",
+        text: "If someone takes hours to reply, you...",
         options: [
-          { label: "👀 Overanalyze every word", value: "anxious" },
-          { label: "😂 Pretend not to care", value: "avoidant" },
-          { label: "🤗 Send a meme, keep it cute", value: "secure" },
-          { label: "👌 Ghost back", value: "avoidant-2" },
-        ],
+          "Panic and spiral 🫠",
+          "Wait but feel hurt 😞",
+          "Don’t really care 🤷",
+          "Start detaching emotionally 🧍‍♂️"
+        ]
       },
       {
-        text: "They say they’re 'emotionally unavailable' but keep texting. You:",
+        key: "emotional_intensity_response",
+        text: "When things get too emotionally intense, you...",
         options: [
-          { label: "Beg for clarity 😅", value: "anxious" },
-          { label: "Keep chatting, no pressure 😎", value: "secure" },
-          { label: "Dip out 👋", value: "avoidant" },
-          { label: "Read but do nothing", value: "avoidant-2" },
-        ],
-      },
-    ],
-  },
+          "Crave more closeness 🥺",
+          "Need space ASAP 🏃‍♀️",
+          "Feel unsure 🌀",
+          "Go numb 🚪"
+        ]
+      }
+    ]
+  }
 ];
 
 const Quiz = () => {
   const navigate = useNavigate();
   const [sectionIdx, setSectionIdx] = useState(0);
-  const [responses, setResponses] = useState<{ [section: number]: { [question: number]: string } }>({});
+  const [responses, setResponses] = useState<{ [key: string]: string }>({});
 
   const section = quizSections[sectionIdx];
 
-  const handleOption = (qIdx: number, value: string) => {
+  const handleOption = (questionKey: string, value: string) => {
     setResponses((prev) => ({
       ...prev,
-      [sectionIdx]: { ...prev[sectionIdx], [qIdx]: value },
+      [questionKey]: value,
     }));
   };
 
   const sectionDone = section.questions.every(
-    (q, i) => responses[sectionIdx]?.[i]
+    q => responses[q.key]
   );
 
   const handleNext = () => {
     if (sectionIdx < quizSections.length - 1) {
       setSectionIdx(sectionIdx + 1);
     } else {
+      // Save quiz answers to session storage for Analyze page:
+      window.sessionStorage.setItem('hcQuizResults', JSON.stringify(responses));
       setTimeout(() => {
-        navigate("/decode-vibe");
+        navigate("/analyze");
       }, 500);
     }
   };
@@ -121,23 +130,23 @@ const Quiz = () => {
         <div className="bg-white/80 dark:bg-gray-900/60 p-8 mt-6 rounded-xl shadow-lg w-full animate-fade-in">
           <h2 className="text-xl font-dancing font-bold mb-2">{section.title}</h2>
           <div className="space-y-7">
-            {section.questions.map((q, i) => (
-              <div key={q.text}>
+            {section.questions.map((q) => (
+              <div key={q.key}>
                 <p className="font-semibold mb-2">{q.text}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {q.options.map((opt) => (
                     <button
-                      key={opt.value}
+                      key={opt}
                       className={`rounded-lg py-2 px-2 text-base bg-gradient-to-r
-                        ${
-                          responses[sectionIdx]?.[i] === opt.value
-                            ? "from-purple-400 to-pink-400 text-white font-bold border-2 border-purple-600"
-                            : "from-purple-100 to-pink-100 text-black/80"
+                        ${responses[q.key] === opt
+                          ? "from-purple-400 to-pink-400 text-white font-bold border-2 border-purple-600"
+                          : "from-purple-100 to-pink-100 text-black/80"
                         }
                         hover:scale-105 transition-all duration-100`}
-                      onClick={() => handleOption(i, opt.value)}
+                      onClick={() => handleOption(q.key, opt)}
+                      type="button"
                     >
-                      {opt.label}
+                      {opt}
                     </button>
                   ))}
                 </div>
@@ -150,11 +159,10 @@ const Quiz = () => {
               size="lg"
               disabled={!sectionDone}
               onClick={handleNext}
-              className={`${
-                sectionDone
-                  ? "bg-gradient-to-r from-pink-400 to-purple-400"
-                  : "bg-gray-300 dark:bg-gray-700"
-              } text-white`}
+              className={`${sectionDone
+                ? "bg-gradient-to-r from-pink-400 to-purple-400"
+                : "bg-gray-300 dark:bg-gray-700"
+                } text-white`}
             >
               {sectionIdx < quizSections.length - 1 ? "Next" : "Reveal my vibe ✨"}
             </Button>

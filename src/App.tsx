@@ -15,6 +15,7 @@ import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Quiz from "./pages/Quiz";
+import Analyze from "./pages/Analyze"; // new
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/quiz" element={<Quiz />} />
+            <Route path="/analyze" element={<Analyze />} />
             <Route path="/decode-vibe" element={<DecodeVibe />} />
             <Route path="/intent-detector" element={<IntentDetectorPage />} />
             <Route path="/pattern-recognizer" element={<PatternRecognizer />} />
