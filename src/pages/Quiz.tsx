@@ -152,10 +152,10 @@ const Quiz = () => {
       const persona = determineVibePersona(responses);
       const defaultMode = determineDefaultMode(responses);
 
-      // Set app mode preferences
+      // Set app mode preferences and complete onboarding FIRST
       setVibePersona(persona);
       setMode(defaultMode);
-      completeOnboarding();
+      completeOnboarding(); // Make sure this happens before navigation
 
       // Save quiz answers to session storage for Analyze page
       window.sessionStorage.setItem("hcQuizResults", JSON.stringify(responses));
@@ -167,14 +167,13 @@ const Quiz = () => {
         } type.`,
       });
 
-      // Redirect to the proper dashboard based on mode
+      // Use a longer delay to ensure state is updated before navigation
       setTimeout(() => {
-        if (defaultMode === "dating") {
-          navigate("/decode-vibe");
-        } else {
-          navigate("/mood-check");
-        }
-      }, 1500);
+        const destination =
+          defaultMode === "dating" ? "/decode-vibe" : "/mood-check";
+        console.log("Navigating to:", destination);
+        navigate(destination, { replace: true });
+      }, 2000);
     }
   };
 
@@ -183,9 +182,7 @@ const Quiz = () => {
       <Header />
       <main className="container px-4 mx-auto max-w-md flex-1 flex flex-col items-center">
         <div className="bg-white/80 dark:bg-gray-900/60 p-8 mt-6 rounded-xl shadow-lg w-full animate-fade-in">
-          <h2 className="text-xl font-dancing font-bold mb-2">
-            {section.title}
-          </h2>
+          <h2 className="text-xl font-bold mb-2">{section.title}</h2>
           <div className="space-y-7">
             {section.questions.map((q) => (
               <div key={q.key}>

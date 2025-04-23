@@ -136,14 +136,15 @@ const Index = () => {
       <Header />
       <main className="flex flex-col flex-1 w-full justify-center items-center relative z-10">
         <div className="w-full px-4">
-          <h1 className="text-2xl sm:text-3xl font-dancing font-bold mb-2 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200 text-center mt-10">
-            Your dreamy digital BFF for checking romantic vibes & emotional
-            glow-ups.
-            <span className="ml-2 text-xl align-top animate-bounce">✨</span>
-          </h1>
-          <p className="text-md mb-6 text-muted-foreground max-w-xs mx-auto text-center emoji-bounce">
-            Ready to spill the tea?
-          </p>
+          <div className="text-center mt-10 mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold mb-2 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200">
+              Your Digital BFF for Love Insights & Emotional Growth
+              <span className="ml-2 text-xl align-top animate-bounce">✨</span>
+            </h1>
+            <p className="text-xl text-purple-600 dark:text-pink-300 font-medium">
+              Ready to spill the tea?
+            </p>
+          </div>
           <HomeFeaturesShowcase />
           <div className="fixed bottom-5 left-1/2 -translate-x-1/2 w-full max-w-xs px-4 z-20">
             <Button

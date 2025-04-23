@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,15 @@ import { Loader2 } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup, isPending, error } = useAuth();
+  const { login, signup, isPending, error, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/quiz", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -54,7 +61,6 @@ const Auth = () => {
       toast.success("Welcome back!", {
         description: "Get ready to decode those relationships",
       });
-      navigate("/quiz");
     } catch (error) {
       // Error handling is done by the store
     }
@@ -88,7 +94,6 @@ const Auth = () => {
       toast.success("Account created!", {
         description: "Let's start decoding your relationships",
       });
-      navigate("/quiz");
     } catch (error) {
       // Error handling is done by the store
     }

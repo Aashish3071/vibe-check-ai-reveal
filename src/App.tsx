@@ -40,6 +40,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const hasCompletedOnboarding = useIsOnboardingComplete();
 
   if (!isAuthenticated) {
+    // Only show the login page if not authenticated
     return <Navigate to="/auth" replace />;
   }
 
@@ -59,6 +60,7 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
   // If already onboarded, redirect to the appropriate dashboard based on mode
   if (isAuthenticated && hasCompletedOnboarding) {
+    // User has already completed onboarding, send to appropriate dashboard
     return (
       <Navigate
         to={mode === "dating" ? "/decode-vibe" : "/mood-check"}
@@ -87,12 +89,14 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+
+            {/* Quiz route - use QuizRoute component so it handles redirect logic */}
             <Route
               path="/quiz"
               element={
-                <LayoutSwitcher showNavigation={false}>
+                <QuizRoute>
                   <Quiz />
-                </LayoutSwitcher>
+                </QuizRoute>
               }
             />
 
