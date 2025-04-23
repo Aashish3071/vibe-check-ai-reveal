@@ -3,8 +3,13 @@ import { Menu, Heart, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "../hooks/use-theme";
 import ModeToggle from "./ModeToggle";
-import { useAuth, useUser, useIsAuthenticated } from "@/lib/auth";
-import { useIsOnboardingComplete } from "@/lib/appMode";
+import {
+  useAuth,
+  useUser,
+  useIsAuthenticated,
+  useIsQuizCompleted,
+} from "@/lib/auth";
+import { useAppMode } from "@/lib/appMode";
 import { useLocation, Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -20,21 +25,27 @@ import { toast } from "sonner";
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const isAuthenticated = useIsAuthenticated();
-  const hasCompletedOnboarding = useIsOnboardingComplete();
+  const isQuizCompleted = useIsQuizCompleted();
   const location = useLocation();
   const { logout } = useAuth();
   const user = useUser();
+  const { mode } = useAppMode();
 
   // Don't show the toggle during quiz or when not authenticated
   const showModeToggle =
     isAuthenticated &&
-    hasCompletedOnboarding &&
-    !location.pathname.includes("/quiz");
+    isQuizCompleted &&
+    !location.pathname.includes("/quiz") &&
+    !location.pathname.includes("/generate-avatar");
 
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
   };
+
+  // Determine avatar emoji and background
+  const avatarEmoji = user?.userAvatar?.emoji || "💖";
+  const avatarName = user?.userAvatar?.name || "";
 
   return (
     <header className="w-full flex justify-between items-center py-4 px-5 md:px-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md fixed top-0 z-50">
@@ -43,6 +54,11 @@ const Header = () => {
         <h1 className="font-dancing text-xl md:text-2xl font-bold">
           HeartCheck AI
         </h1>
+        {showModeToggle && (
+          <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 dark:bg-purple-900/40">
+            {mode === "dating" ? "Bestie AI 🤪" : "Therapist AI 🌿"}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
@@ -63,25 +79,43 @@ const Header = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost" className="rounded-full">
-              <Menu className="h-5 w-5" />
-            </Button>
+            {user?.userAvatar ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full border overflow-hidden hover:bg-transparent"
+              >
+                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-xl">
+                  {avatarEmoji}
+                </div>
+              </Button>
+            ) : (
+              <Button size="icon" variant="ghost" className="rounded-full">
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             {user ? (
               <>
                 <DropdownMenuLabel>
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8 border-2 border-purple-200 dark:border-purple-800">
-                      <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="text-[10px] bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                        {user?.name?.substring(0, 2).toUpperCase() || "ME"}
-                      </AvatarFallback>
-                    </Avatar>
+                    {user.userAvatar ? (
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-xl border-2 border-purple-200 dark:border-purple-800">
+                        {avatarEmoji}
+                      </div>
+                    ) : (
+                      <Avatar className="h-8 w-8 border-2 border-purple-200 dark:border-purple-800">
+                        <AvatarImage src={user?.avatar} alt={user?.name} />
+                        <AvatarFallback className="text-[10px] bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                          {user?.name?.substring(0, 2).toUpperCase() || "ME"}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     <div className="flex flex-col">
                       <span className="font-semibold">{user.name}</span>
                       <span className="text-xs text-muted-foreground">
-                        @{user.username}
+                        {avatarName || "@" + user.username}
                       </span>
                     </div>
                   </div>
@@ -93,7 +127,10 @@ const Header = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/analyze" className="cursor-pointer">
+                  <Link
+                    to={mode === "dating" ? "/decode-vibe" : "/mood-check"}
+                    className="cursor-pointer"
+                  >
                     Dashboard
                   </Link>
                 </DropdownMenuItem>

@@ -1,5 +1,5 @@
 import React from "react";
-import ConversationAnalyzer from "@/components/ConversationAnalyzer";
+import ConversationAnalyzer from "@/features/bestie/components/ConversationAnalyzer";
 
 const DecodeVibe = () => {
   return (

@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./hooks/use-theme";
-import { useIsAuthenticated } from "./lib/auth";
-import { useIsOnboardingComplete, useAppMode } from "./lib/appMode";
+import { useIsAuthenticated, useIsQuizCompleted } from "./lib/auth";
+import { useAppMode } from "./lib/appMode";
 
 // Shared Pages
 import Index from "./pages/Index";
@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import Quiz from "./pages/Quiz";
 import NotFound from "./pages/NotFound";
 import Journal from "./pages/Journal";
+import AvatarGenerator from "./pages/AvatarGenerator";
 
 // Layout
 import LayoutSwitcher from "./components/LayoutSwitcher";
@@ -43,15 +44,17 @@ const queryClient = new QueryClient();
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useIsAuthenticated();
-  const hasCompletedOnboarding = useIsOnboardingComplete();
+  const isQuizCompleted = useIsQuizCompleted();
 
   if (!isAuthenticated) {
     // Only show the login page if not authenticated
+    console.log("ProtectedRoute - Redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to quiz if onboarding not completed
-  if (!hasCompletedOnboarding) {
+  // Redirect to quiz if quiz not completed
+  if (!isQuizCompleted) {
+    console.log("ProtectedRoute - Redirecting to quiz");
     return <Navigate to="/quiz" replace />;
   }
 
@@ -61,16 +64,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Route that conditionally shows quiz or redirects to appropriate dashboard
 const QuizRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useIsAuthenticated();
-  const hasCompletedOnboarding = useIsOnboardingComplete();
+  const isQuizCompleted = useIsQuizCompleted();
   const { mode } = useAppMode();
 
   console.log("QuizRoute - isAuthenticated:", isAuthenticated);
-  console.log("QuizRoute - hasCompletedOnboarding:", hasCompletedOnboarding);
+  console.log("QuizRoute - isQuizCompleted:", isQuizCompleted);
 
-  // If already onboarded, redirect to the appropriate dashboard based on mode
-  if (isAuthenticated && hasCompletedOnboarding) {
-    console.log("QuizRoute - Redirecting to dashboard");
-    // User has already completed onboarding, send to appropriate dashboard
+  // If already completed quiz, redirect to the avatar generator or appropriate dashboard
+  if (isAuthenticated && isQuizCompleted) {
+    console.log("QuizRoute - Quiz completed, redirecting to dashboard");
+    // User has already completed quiz, send to appropriate dashboard
     return (
       <Navigate
         to={mode === "dating" ? "/decode-vibe" : "/mood-check"}
@@ -81,12 +84,31 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {
-    console.log("QuizRoute - Redirecting to auth");
+    console.log("QuizRoute - Not authenticated, redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
   console.log("QuizRoute - Showing quiz");
   // Show the quiz with showNavigation=false
+  return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
+};
+
+// Route specifically for avatar generation after quiz
+const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = useIsAuthenticated();
+  const isQuizCompleted = useIsQuizCompleted();
+
+  // If not authenticated, redirect to auth
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // If quiz not completed, redirect to quiz first
+  if (!isQuizCompleted) {
+    return <Navigate to="/quiz" replace />;
+  }
+
+  // Show the avatar generator with no navigation
   return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
 };
 
@@ -102,13 +124,21 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
 
-            {/* Quiz route - use QuizRoute component so it handles redirect logic */}
+            {/* Quiz and Avatar Generator routes */}
             <Route
               path="/quiz"
               element={
                 <QuizRoute>
                   <Quiz />
                 </QuizRoute>
+              }
+            />
+            <Route
+              path="/generate-avatar"
+              element={
+                <AvatarRoute>
+                  <AvatarGenerator />
+                </AvatarRoute>
               }
             />
 

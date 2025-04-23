@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useAppMode, VibePersona } from "@/lib/appMode";
+import { useSetUserTags } from "@/lib/auth";
 import { toast } from "sonner";
 
 const quizSections = [
@@ -131,7 +132,8 @@ const Quiz = () => {
   const navigate = useNavigate();
   const [sectionIdx, setSectionIdx] = useState(0);
   const [responses, setResponses] = useState<{ [key: string]: string }>({});
-  const { setVibePersona, setMode, completeOnboarding } = useAppMode();
+  const { setVibePersona, setMode } = useAppMode();
+  const setUserTags = useSetUserTags();
 
   const section = quizSections[sectionIdx];
 
@@ -152,28 +154,57 @@ const Quiz = () => {
       const persona = determineVibePersona(responses);
       const defaultMode = determineDefaultMode(responses);
 
-      // Set app mode preferences and complete onboarding FIRST
+      // Set app mode preferences
       setVibePersona(persona);
       setMode(defaultMode);
-      completeOnboarding(); // Make sure this happens before navigation
 
-      // Save quiz answers to session storage for Analyze page
+      // Set user tags based on quiz responses
+      setUserTags({
+        emotionalVibe: persona,
+        attachmentStyle: determineAttachmentStyle(responses),
+        tonePref: determineTonePreference(responses),
+      });
+
+      // Save quiz answers to session storage for reference
       window.sessionStorage.setItem("hcQuizResults", JSON.stringify(responses));
 
       // Show success message
-      toast.success(`Your Vibe Persona is ready! ✨`, {
-        description: `You're the ${
-          persona.charAt(0).toUpperCase() + persona.slice(1)
-        } type.`,
+      toast.success(`Your quiz is complete! ✨`, {
+        description: "Now let's create your personalized avatar!",
       });
 
-      // Use a longer delay to ensure state is updated before navigation
-      setTimeout(() => {
-        const destination =
-          defaultMode === "dating" ? "/decode-vibe" : "/mood-check";
-        console.log("Navigating to:", destination);
-        navigate(destination, { replace: true });
-      }, 2000);
+      // Navigate to avatar generator
+      navigate("/generate-avatar", { replace: true });
+    }
+  };
+
+  // Helper function to determine attachment style
+  const determineAttachmentStyle = (responses: {
+    [key: string]: string;
+  }): string => {
+    if (responses.reply_response?.includes("Panic")) {
+      return "anxious";
+    } else if (responses.emotional_intensity_response?.includes("Need space")) {
+      return "avoidant";
+    } else if (responses.conflict_response?.includes("Talk it out")) {
+      return "secure";
+    } else {
+      return "complex";
+    }
+  };
+
+  // Helper function to determine tone preference
+  const determineTonePreference = (responses: {
+    [key: string]: string;
+  }): string => {
+    if (responses.toxic_trait?.includes("Overthinking")) {
+      return "gentle";
+    } else if (responses.conflict_response?.includes("Blow up")) {
+      return "direct";
+    } else if (responses.relationship_goal?.includes("Self-growth")) {
+      return "motivational";
+    } else {
+      return "balanced";
     }
   };
 
@@ -222,7 +253,7 @@ const Quiz = () => {
             >
               {sectionIdx < quizSections.length - 1
                 ? "Next"
-                : "Reveal my vibe ✨"}
+                : "Create My Avatar ✨"}
             </Button>
           </div>
         </div>

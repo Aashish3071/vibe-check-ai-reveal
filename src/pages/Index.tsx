@@ -137,22 +137,86 @@ const Index = () => {
       <main className="flex flex-col flex-1 w-full justify-center items-center relative z-10">
         <div className="w-full px-4">
           <div className="text-center mt-10 mb-6">
-            <h1 className="text-xl sm:text-2xl mb-3 animate-fade-in-fast tracking-tight text-purple-700 dark:text-pink-200">
-              Your Digital BFF for Love Insights & Emotional Growth
+            <h1 className="text-xl sm:text-2xl mb-3 tracking-tight text-purple-700 dark:text-pink-200 relative">
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "0ms" }}
+              >
+                Your
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "100ms" }}
+              >
+                {" "}
+                Digital
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "200ms" }}
+              >
+                {" "}
+                BFF
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "300ms" }}
+              >
+                {" "}
+                for
+              </span>
+              <br />
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "400ms" }}
+              >
+                Love
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "500ms" }}
+              >
+                {" "}
+                Insights
+              </span>
+              <span
+                className="animate-pulse animate-infinite inline-block mx-1"
+                style={{ animationDelay: "600ms" }}
+              >
+                &
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "700ms" }}
+              >
+                Emotional
+              </span>
+              <span
+                className="animate-fade-in-down inline-block"
+                style={{ animationDelay: "800ms" }}
+              >
+                {" "}
+                Growth
+              </span>
               <span className="ml-2 text-xl align-top animate-bounce">✨</span>
             </h1>
-            <p className="text-xl text-purple-600 dark:text-pink-300">
-              Ready to spill the tea?
+            <p className="text-xl text-purple-600 dark:text-pink-300 animate-fade-in-up">
+              <span className="animate-pulse inline-block">Ready</span> to{" "}
+              <span className="animate-pulse inline-block delay-300">
+                spill
+              </span>{" "}
+              the{" "}
+              <span className="animate-pulse inline-block delay-600">tea</span>?
             </p>
           </div>
           <HomeFeaturesShowcase />
           <div className="fixed bottom-5 left-1/2 -translate-x-1/2 w-full max-w-xs px-4 z-20">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full text-lg font-bold shadow-xl tracking-tight"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full text-lg font-bold shadow-xl tracking-tight animate-pulse-soft"
               onClick={() => (window.location.href = "/auth")}
             >
-              Get Started ✨
+              Decode Your Vibe ✨
             </Button>
           </div>
         </div>
