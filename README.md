@@ -1,51 +1,63 @@
-# Welcome to Vibe-Check-Ai
+# ❤️ HeartCheck AI
 
-## Project info
+![HeartCheck AI Preview](/public/preview.png)
 
-**URL**: https://lovable.dev/projects/aa044559-6944-4099-ba72-b7aed5df160d
+> A mobile-first app for Gen-Z to analyze romantic conversations and emotional well-being with AI insights.
 
-**Use your preferred IDE**
+HeartCheck AI is a mobile-first app for Gen-Z that helps analyze romantic conversations and emotional well-being. The app features a dual-mode interface that switches between "Dating Bestie" and "Therapist Bestie" modes.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+![HeartCheck AI](./public/heartcheck-preview.png)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Features
 
-Follow these steps:
+### 💘 Dating Bestie Mode
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Conversation Analyzer**: Decode the vibe of your chats and get insights
+- **Intent Detector**: Understand someone's level of interest in you
+- **Pattern Recognizer**: Identify recurring relationship patterns
+- **Tarot Mode**: Get mystical insights about your situation
+- **Love Journal**: Track your emotional growth and relationship history
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🧠 Therapist Bestie Mode
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Mood Check-in**: Daily reflection on your emotional state
+- **Self-Coaching**: Get gentle guidance for emotional challenges
+- **Pattern Tracker**: Identify emotional and behavioral patterns
+- **Prompted Journal**: Guided journaling for self-discovery
+- **Timeline View**: Track your emotional growth over time
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Core Experience
+
+- Personalized "Vibe Persona" based on emotional and relationship patterns
+- Seamless toggle between Dating and Therapist modes
+- User authentication and profile management
+- Unique UI theme for each mode
+
+## Tech Stack
+
+- React with TypeScript
+- Tailwind CSS for styling
+- Framer Motion for animations
+- Zustand for state management
+- React Router for navigation
+- Shadcn UI components
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:8080` in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Contributing
 
-**Use GitHub Codespaces**
+This project is in active development. Feel free to open issues or submit pull requests.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## License
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+MIT

@@ -1,37 +1,123 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, TrendingUp, CircleX, BookHeart } from 'lucide-react';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import {
+  MessageSquareText,
+  User2,
+  Sparkles,
+  BrainCircuit,
+  ScrollText,
+  Heart,
+  Smile,
+  Lightbulb,
+  BarChart,
+} from "lucide-react";
+import { useAppMode } from "@/lib/appMode";
 
 const Navigation = () => {
+  const location = useLocation();
+  const { mode } = useAppMode();
+
+  // Dating mode navigation items
+  const datingNavItems = [
+    {
+      path: "/decode-vibe",
+      icon: <MessageSquareText className="h-6 w-6" />,
+      label: "Decode Vibe",
+    },
+    {
+      path: "/intent-detector",
+      icon: <User2 className="h-6 w-6" />,
+      label: "Do They Like Me",
+    },
+    {
+      path: "/pattern-recognizer",
+      icon: <BrainCircuit className="h-6 w-6" />,
+      label: "Pattern Loop",
+    },
+    {
+      path: "/tarot-mode",
+      icon: <Sparkles className="h-6 w-6" />,
+      label: "Tarot",
+    },
+    {
+      path: "/journal",
+      icon: <ScrollText className="h-6 w-6" />,
+      label: "Journal",
+    },
+  ];
+
+  // Therapist mode navigation items
+  const therapistNavItems = [
+    {
+      path: "/mood-check",
+      icon: <Smile className="h-6 w-6" />,
+      label: "Mood Check",
+    },
+    {
+      path: "/self-coaching",
+      icon: <Lightbulb className="h-6 w-6" />,
+      label: "Self-Coaching",
+    },
+    {
+      path: "/pattern-tracker",
+      icon: <BarChart className="h-6 w-6" />,
+      label: "Patterns",
+    },
+    {
+      path: "/prompted-journal",
+      icon: <ScrollText className="h-6 w-6" />,
+      label: "Journal",
+    },
+    {
+      path: "/journal",
+      icon: <Heart className="h-6 w-6" />,
+      label: "Timeline",
+    },
+  ];
+
+  // Select navigation items based on mode
+  const navItems = mode === "dating" ? datingNavItems : therapistNavItems;
+
+  // Dynamic styling based on mode
+  const activeColor =
+    mode === "dating"
+      ? "text-purple-600 dark:text-pink-400"
+      : "text-green-600 dark:text-teal-400";
+
+  const hoverColor =
+    mode === "dating"
+      ? "hover:text-purple-600 dark:hover:text-pink-400"
+      : "hover:text-green-600 dark:hover:text-teal-400";
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md py-2 px-4 flex justify-around items-center shadow-lg z-50 rounded-t-3xl">
-      <Link to="/decode-vibe" className="flex flex-col items-center justify-center p-2 text-purple-600 dark:text-purple-400">
-        <MessageCircle className="h-6 w-6" />
-        <span className="text-[10px] mt-1">Decode</span>
-      </Link>
-      
-      <Link to="/intent-detector" className="flex flex-col items-center justify-center p-2 text-pink-500 dark:text-pink-400">
-        <Heart className="h-6 w-6" />
-        <span className="text-[10px] mt-1">Intent</span>
-      </Link>
-      
-      <Link to="/" className="relative flex flex-col items-center justify-center">
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-12 w-12 rounded-full flex items-center justify-center shadow-lg -mt-5">
-          <Heart className="h-6 w-6 text-white fill-white" />
+    <nav
+      className={cn(
+        "fixed bottom-0 left-0 right-0 backdrop-blur-md border-t z-50",
+        mode === "dating"
+          ? "bg-white/70 dark:bg-gray-900/70 border-gray-200 dark:border-gray-800"
+          : "bg-white/70 dark:bg-gray-900/70 border-green-100 dark:border-green-950/50"
+      )}
+    >
+      <div className="max-w-md mx-auto px-4">
+        <div className="flex justify-between items-center">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center py-3 px-2 text-xs",
+                location.pathname === item.path
+                  ? activeColor
+                  : `text-gray-500 dark:text-gray-400 ${hoverColor}`
+              )}
+            >
+              {item.icon}
+              <span className="mt-1">{item.label}</span>
+            </Link>
+          ))}
         </div>
-        <span className="text-[10px] mt-1 text-purple-600 dark:text-purple-400">Home</span>
-      </Link>
-      
-      <Link to="/pattern-recognizer" className="flex flex-col items-center justify-center p-2 text-purple-600 dark:text-purple-400">
-        <TrendingUp className="h-6 w-6" />
-        <span className="text-[10px] mt-1">Patterns</span>
-      </Link>
-      
-      <Link to="/journal" className="flex flex-col items-center justify-center p-2 text-pink-500 dark:text-pink-400">
-        <BookHeart className="h-6 w-6" />
-        <span className="text-[10px] mt-1">Journal</span>
-      </Link>
+      </div>
     </nav>
   );
 };

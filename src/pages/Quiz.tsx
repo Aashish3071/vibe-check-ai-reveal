@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
+import { useAppMode, VibePersona } from "@/lib/appMode";
+import { toast } from "sonner";
 
 const quizSections = [
   {
@@ -12,34 +12,24 @@ const quizSections = [
       {
         key: "current_mood",
         text: "How are you feeling today, bestie?",
-        options: [
-          "😫 Anxious",
-          "😍 In love",
-          "😐 Meh",
-          "🧘‍♀️ Chillin’"
-        ]
+        options: ["😫 Anxious", "😍 In love", "😐 Meh", "🧘‍♀️ Chillin'"],
       },
       {
         key: "talking_to_someone",
         text: "Are you currently talking to someone?",
-        options: [
-          "Yes",
-          "Kinda",
-          "No",
-          "It’s complicated"
-        ]
+        options: ["Yes", "Kinda", "No", "It's complicated"],
       },
       {
         key: "relationship_goal",
-        text: "What’s your relationship goal right now?",
+        text: "What's your relationship goal right now?",
         options: [
           "Just healing 🧘‍♀️",
           "Looking for love 💘",
           "Situationship drama 😵‍💫",
-          "Self-growth era ✨"
-        ]
-      }
-    ]
+          "Self-growth era ✨",
+        ],
+      },
+    ],
   },
   {
     title: "Emotional Personality",
@@ -51,8 +41,8 @@ const quizSections = [
           "Ghosting",
           "Love bombing",
           "Overthinking everything",
-          "Trust issues"
-        ]
+          "Trust issues",
+        ],
       },
       {
         key: "conflict_response",
@@ -61,10 +51,10 @@ const quizSections = [
           "Shut down 🧊",
           "Talk it out 💬",
           "Blow up 💥",
-          "Avoid it 😶"
-        ]
-      }
-    ]
+          "Avoid it 😶",
+        ],
+      },
+    ],
   },
   {
     title: "Attachment Style (Situational)",
@@ -75,9 +65,9 @@ const quizSections = [
         options: [
           "Panic and spiral 🫠",
           "Wait but feel hurt 😞",
-          "Don’t really care 🤷",
-          "Start detaching emotionally 🧍‍♂️"
-        ]
+          "Don't really care 🤷",
+          "Start detaching emotionally 🧍‍♂️",
+        ],
       },
       {
         key: "emotional_intensity_response",
@@ -86,17 +76,62 @@ const quizSections = [
           "Crave more closeness 🥺",
           "Need space ASAP 🏃‍♀️",
           "Feel unsure 🌀",
-          "Go numb 🚪"
-        ]
-      }
-    ]
-  }
+          "Go numb 🚪",
+        ],
+      },
+    ],
+  },
 ];
+
+const determineVibePersona = (responses: {
+  [key: string]: string;
+}): VibePersona => {
+  // Logic to determine vibe persona based on quiz responses
+  if (
+    responses.toxic_trait === "Overthinking everything" ||
+    responses.reply_response === "Panic and spiral 🫠"
+  ) {
+    return "cautious";
+  } else if (
+    responses.relationship_goal === "Just healing 🧘‍♀️" ||
+    responses.emotional_intensity_response === "Need space ASAP 🏃‍♀️"
+  ) {
+    return "reflective";
+  } else if (
+    responses.conflict_response === "Talk it out 💬" ||
+    responses.relationship_goal === "Self-growth era ✨"
+  ) {
+    return "balanced";
+  } else if (
+    responses.toxic_trait === "Trust issues" ||
+    responses.emotional_intensity_response === "Go numb 🚪"
+  ) {
+    return "analytical";
+  } else {
+    return "hopeful";
+  }
+};
+
+const determineDefaultMode = (responses: { [key: string]: string }) => {
+  // Logic to determine default mode based on quiz responses
+  const therapistIndicators = [
+    responses.relationship_goal === "Just healing 🧘‍♀️",
+    responses.relationship_goal === "Self-growth era ✨",
+    responses.conflict_response === "Shut down 🧊",
+    responses.toxic_trait === "Trust issues",
+  ];
+
+  // If more than 2 therapist indicators, default to therapist mode
+  return therapistIndicators.filter(Boolean).length >= 2
+    ? "therapist"
+    : "dating";
+};
 
 const Quiz = () => {
   const navigate = useNavigate();
   const [sectionIdx, setSectionIdx] = useState(0);
   const [responses, setResponses] = useState<{ [key: string]: string }>({});
+  const { setVibePersona, setMode, completeOnboarding } = useAppMode();
 
   const section = quizSections[sectionIdx];
 
@@ -107,19 +142,39 @@ const Quiz = () => {
     }));
   };
 
-  const sectionDone = section.questions.every(
-    q => responses[q.key]
-  );
+  const sectionDone = section.questions.every((q) => responses[q.key]);
 
   const handleNext = () => {
     if (sectionIdx < quizSections.length - 1) {
       setSectionIdx(sectionIdx + 1);
     } else {
-      // Save quiz answers to session storage for Analyze page:
-      window.sessionStorage.setItem('hcQuizResults', JSON.stringify(responses));
+      // Determine vibe persona and default mode
+      const persona = determineVibePersona(responses);
+      const defaultMode = determineDefaultMode(responses);
+
+      // Set app mode preferences
+      setVibePersona(persona);
+      setMode(defaultMode);
+      completeOnboarding();
+
+      // Save quiz answers to session storage for Analyze page
+      window.sessionStorage.setItem("hcQuizResults", JSON.stringify(responses));
+
+      // Show success message
+      toast.success(`Your Vibe Persona is ready! ✨`, {
+        description: `You're the ${
+          persona.charAt(0).toUpperCase() + persona.slice(1)
+        } type.`,
+      });
+
+      // Redirect to the proper dashboard based on mode
       setTimeout(() => {
-        navigate("/analyze");
-      }, 500);
+        if (defaultMode === "dating") {
+          navigate("/decode-vibe");
+        } else {
+          navigate("/mood-check");
+        }
+      }, 1500);
     }
   };
 
@@ -128,7 +183,9 @@ const Quiz = () => {
       <Header />
       <main className="container px-4 mx-auto max-w-md flex-1 flex flex-col items-center">
         <div className="bg-white/80 dark:bg-gray-900/60 p-8 mt-6 rounded-xl shadow-lg w-full animate-fade-in">
-          <h2 className="text-xl font-dancing font-bold mb-2">{section.title}</h2>
+          <h2 className="text-xl font-dancing font-bold mb-2">
+            {section.title}
+          </h2>
           <div className="space-y-7">
             {section.questions.map((q) => (
               <div key={q.key}>
@@ -138,9 +195,10 @@ const Quiz = () => {
                     <button
                       key={opt}
                       className={`rounded-lg py-2 px-2 text-base bg-gradient-to-r
-                        ${responses[q.key] === opt
-                          ? "from-purple-400 to-pink-400 text-white font-bold border-2 border-purple-600"
-                          : "from-purple-100 to-pink-100 text-black/80"
+                        ${
+                          responses[q.key] === opt
+                            ? "from-purple-400 to-pink-400 text-white font-bold border-2 border-purple-600"
+                            : "from-purple-100 to-pink-100 text-black/80"
                         }
                         hover:scale-105 transition-all duration-100`}
                       onClick={() => handleOption(q.key, opt)}
@@ -159,18 +217,21 @@ const Quiz = () => {
               size="lg"
               disabled={!sectionDone}
               onClick={handleNext}
-              className={`${sectionDone
-                ? "bg-gradient-to-r from-pink-400 to-purple-400"
-                : "bg-gray-300 dark:bg-gray-700"
-                } text-white`}
+              className={`${
+                sectionDone
+                  ? "bg-gradient-to-r from-pink-400 to-purple-400"
+                  : "bg-gray-300 dark:bg-gray-700"
+              } text-white`}
             >
-              {sectionIdx < quizSections.length - 1 ? "Next" : "Reveal my vibe ✨"}
+              {sectionIdx < quizSections.length - 1
+                ? "Next"
+                : "Reveal my vibe ✨"}
             </Button>
           </div>
         </div>
       </main>
-      <Navigation />
     </div>
   );
 };
+
 export default Quiz;
