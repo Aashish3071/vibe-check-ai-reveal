@@ -72,8 +72,8 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Always use showNavigation=false for quiz pages
-  return <>{children}</>;
+  // Show the quiz with showNavigation=false
+  return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
 };
 
 const App = () => (
