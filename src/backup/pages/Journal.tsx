@@ -709,38 +709,40 @@ const Journal = () => {
           </Dialog>
         </div>
 
-        <TabsContent value="entries" className="mt-0">
-          {entries.length > 0 ? (
-            <div className="space-y-4">
-              {entries.map((entry) => (
-                <JournalEntryCard
-                  key={entry.id}
-                  entry={entry}
-                  onEdit={(id) =>
-                    setEditingEntry(entries.find((e) => e.id === id) || null)
-                  }
-                  onDelete={handleDeleteEntry}
-                />
-              ))}
-            </div>
-          ) : (
-            <Card className="text-center p-6">
-              <p>No journal entries yet</p>
-              <Button
-                onClick={() => setIsNewEntryDialogOpen(true)}
-                variant="outline"
-                className="mt-4"
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Create Your First Entry
-              </Button>
-            </Card>
-          )}
-        </TabsContent>
+        <Tabs>
+          <TabsContent value="entries" className="mt-0">
+            {entries.length > 0 ? (
+              <div className="space-y-4">
+                {entries.map((entry) => (
+                  <JournalEntryCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={(id) =>
+                      setEditingEntry(entries.find((e) => e.id === id) || null)
+                    }
+                    onDelete={handleDeleteEntry}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="text-center p-6">
+                <p>No journal entries yet</p>
+                <Button
+                  onClick={() => setIsNewEntryDialogOpen(true)}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Create Your First Entry
+                </Button>
+              </Card>
+            )}
+          </TabsContent>
 
-        <TabsContent value="growth" className="mt-0">
-          <GrowthSummary entries={entries} />
-        </TabsContent>
+          <TabsContent value="growth" className="mt-0">
+            <GrowthSummary entries={entries} />
+          </TabsContent>
+        </Tabs>
       </main>
       <Navigation />
     </div>

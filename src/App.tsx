@@ -1,32 +1,36 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/common/components/ui/toaster";
+import { Toaster as Sonner } from "@/common/components/ui/sonner";
+import { TooltipProvider } from "@/common/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./hooks/use-theme";
-import { useIsAuthenticated, useIsQuizCompleted } from "./lib/auth";
-import { useAppMode } from "./lib/appMode";
+import { useIsAuthenticated, useIsQuizCompleted } from "@/common/lib/auth";
+import { useAppMode } from "@/common/lib/appMode";
 
-// Shared Pages
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Quiz from "./pages/Quiz";
-import NotFound from "./pages/NotFound";
-import Journal from "./pages/Journal";
-import AvatarGenerator from "./pages/AvatarGenerator";
+// Common Components
+import { LayoutSwitcher, NotFound } from "@/common/components";
 
-// Layout
-import LayoutSwitcher from "./components/LayoutSwitcher";
+// Home Page
+import { HomePage } from "@/features/home/pages";
 
-// Dating Bestie Pages and Components
-import DecodeVibe from "./features/bestie/pages/DecodeVibe";
-import IntentDetectorPage from "./features/bestie/pages/IntentDetectorPage";
-import PatternRecognizer from "./features/bestie/pages/PatternRecognizer";
-import TarotMode from "./features/bestie/pages/TarotMode";
-import Analyze from "./features/bestie/pages/Analyze";
+// Auth Pages
+import { AuthPage } from "@/features/auth/pages";
 
-// Therapist Bestie Pages and Components
-import MoodCheckPage from "./features/therapist/pages/MoodCheckPage";
+// Profile Pages
+import { Quiz, AvatarGenerator } from "@/features/profile/pages";
+
+// Dating Bestie Pages
+import {
+  Analyze,
+  DecodeVibe,
+  IntentDetectorPage,
+  PatternRecognizer,
+  TarotMode,
+} from "@/features/bestie/pages";
+
+// Therapist Bestie Pages
+import { MoodCheckPage } from "@/features/therapist/pages";
+import { Journal } from "@/features/therapist/components";
 
 // Placeholder components for remaining therapist mode features
 const SelfCoaching = () => (
@@ -43,7 +47,7 @@ const queryClient = new QueryClient();
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
 
   if (!isAuthenticated) {
@@ -63,7 +67,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Route that conditionally shows quiz or redirects to appropriate dashboard
 const QuizRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
   const { mode } = useAppMode();
 
@@ -95,7 +99,7 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Route specifically for avatar generation after quiz
 const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
 
   // If not authenticated, redirect to auth
@@ -121,8 +125,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/auth" element={<AuthPage />} />
 
             {/* Quiz and Avatar Generator routes */}
             <Route

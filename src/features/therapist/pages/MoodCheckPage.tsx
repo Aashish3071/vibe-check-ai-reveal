@@ -1,5 +1,5 @@
 import React from "react";
-import MoodCheck from "@/components/therapist/MoodCheck";
+import MoodCheck from "@/features/therapist/components/MoodCheck";
 
 const MoodCheckPage = () => {
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/common/components/ui/button";
+import { Textarea } from "@/common/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/common/components/ui/card";
 import {
   MessageCircle,
   Eye,
@@ -18,9 +18,9 @@ import {
   Download,
   Copy,
 } from "lucide-react";
-import Sparkles from "@/components/Sparkles";
+import Sparkles from "@/common/components/Sparkles";
 import { toast } from "sonner";
-import { analyzeConversation, VibeAnalysis } from "@/lib/api";
+import { analyzeConversation, ConversationAnalysis } from "@/common/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -28,14 +28,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { useAuth } from "@/lib/auth";
+} from "@/common/components/ui/dialog";
+import { useAuth } from "@/common/lib/auth";
 
 const ConversationAnalyzer = () => {
   const { user } = useAuth();
   const [conversation, setConversation] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [results, setResults] = useState<VibeAnalysis | null>(null);
+  const [results, setResults] = useState<ConversationAnalysis | null>(null);
 
   const handleAnalyze = async () => {
     if (!conversation.trim()) {
@@ -84,16 +84,17 @@ const ConversationAnalyzer = () => {
 ✨ HeartCheck AI Vibe Analysis ✨
 
 Vibe Check:
-${results.vibe}
+${results.sentiment}
 
 What's Their Deal:
-${results.intentions}
+${results.keyInsights.join("\n")}
 
 Flags & Greenlights:
-${results.flags}
+Red Flags: ${results.redFlags.join(", ")}
+Green Flags: ${results.greenFlags.join(", ")}
 
 My Next Move:
-${results.nextMove}
+${results.advice}
 
 ✨ Analysis by HeartCheck AI ✨
 `;
@@ -113,7 +114,7 @@ ${results.nextMove}
 
     const shareData = {
       title: "HeartCheck AI Analysis",
-      text: `Check out my relationship vibe analysis from HeartCheck AI! ✨\n\n${results.vibe}`,
+      text: `Check out my relationship vibe analysis from HeartCheck AI! ✨\n\n${results.sentiment}`,
       url: "https://heartcheck.ai", // This would be your actual website URL
     };
 
@@ -135,7 +136,7 @@ ${results.nextMove}
     content,
     color,
   }: {
-    icon: any;
+    icon: React.ElementType;
     title: string;
     content: string;
     color: string;
@@ -205,84 +206,73 @@ ${results.nextMove}
   );
 
   return (
-    <div className="max-w-md mx-auto pt-4">
+    <div className="w-full max-w-md mx-auto p-4">
+      <h2 className="text-2xl font-dancing text-center mb-2">
+        Decode the Vibe ✨
+      </h2>
+      <p className="text-center text-muted-foreground mb-6">
+        Paste your texts and get the real tea
+      </p>
+
       {!results ? (
-        <Card className="gradient-card border-white/50 dark:border-purple-900/30 shadow-lg mt-2">
-          <CardHeader>
-            <CardTitle>Decode the Vibe</CardTitle>
-            <CardDescription>
-              Paste a conversation to analyze the emotions and intentions.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder="Paste your text messages, DMs, or conversation here..."
-              value={conversation}
-              onChange={(e) => setConversation(e.target.value)}
-              rows={10}
-              className="resize-none mb-4"
-            />
-            <div className="text-xs text-muted-foreground mb-2">
-              <p>
-                All conversations are analyzed privately and confidentially.
-              </p>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              onClick={handleAnalyze}
-              disabled={isAnalyzing || !conversation.trim()}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
-            >
-              {isAnalyzing ? "Analyzing..." : "Decode This Conversation"}
-            </Button>
-          </CardFooter>
-        </Card>
+        <>
+          <Textarea
+            value={conversation}
+            onChange={(e) => setConversation(e.target.value)}
+            placeholder="Paste your convo here... (like 'they said hey wyd and I waited 3 hrs to say nm u?')"
+            className="dreamy-input min-h-[200px] text-sm mb-4"
+          />
+
+          <Button
+            onClick={handleAnalyze}
+            disabled={isAnalyzing}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity"
+          >
+            {isAnalyzing ? "Reading the tea leaves..." : "Decode This Convo ✨"}
+          </Button>
+        </>
       ) : (
-        <div className="space-y-4 pb-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Your Analysis</h2>
-            <div className="flex gap-2">
-              <ShareDialog />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearResults}
-                className="gap-1"
-              >
-                New Analysis
-              </Button>
-            </div>
-          </div>
+        <div className="space-y-4">
+          <ResultCard
+            icon={MessageCircle}
+            title="✨ Vibe Check"
+            content={results.sentiment}
+            color="bg-purple-500"
+          />
 
-          <div className="space-y-4">
-            <ResultCard
-              icon={Eye}
-              title="Overall Vibe Check"
-              content={results.vibe}
-              color="bg-purple-500"
-            />
+          <ResultCard
+            icon={Eye}
+            title="👁️ What's Their Deal"
+            content={results.keyInsights.join("\n")}
+            color="bg-pink-500"
+          />
 
-            <ResultCard
-              icon={MessageCircle}
-              title="What's Their Deal"
-              content={results.intentions}
-              color="bg-pink-500"
-            />
+          <ResultCard
+            icon={Flag}
+            title="🚩 Flags & Greenlights"
+            content={`Red Flags: ${results.redFlags.join(
+              ", "
+            )}\nGreen Flags: ${results.greenFlags.join(", ")}`}
+            color="bg-red-500"
+          />
 
-            <ResultCard
-              icon={Flag}
-              title="Flags & Greenlights"
-              content={results.flags}
-              color="bg-red-500"
-            />
+          <ResultCard
+            icon={Smartphone}
+            title="📱 My Next Move"
+            content={results.advice}
+            color="bg-blue-500"
+          />
 
-            <ResultCard
-              icon={Smartphone}
-              title="Your Next Move"
-              content={results.nextMove}
-              color="bg-blue-500"
-            />
+          <div className="flex gap-3">
+            <Button
+              onClick={clearResults}
+              variant="outline"
+              className="flex-1 border-2 border-purple-300 dark:border-purple-700"
+            >
+              Analyze Another Convo
+            </Button>
+
+            <ShareDialog />
           </div>
         </div>
       )}

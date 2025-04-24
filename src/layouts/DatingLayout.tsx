@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import { useAppMode } from "@/lib/appMode";
-import Sparkles from "@/components/Sparkles";
+import Sparkles from "@/common/components/Sparkles";
 
 interface DatingLayoutProps {
   children: React.ReactNode;

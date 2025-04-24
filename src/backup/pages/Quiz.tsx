@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useAppMode, VibePersona } from "@/lib/appMode";
-import { useSetUserTags } from "@/lib/auth";
+import { useSetQuizCompleted, useSetUserTags } from "@/lib/auth";
 import { toast } from "sonner";
 
 const quizSections = [
@@ -135,6 +135,8 @@ const Quiz = () => {
   const { setVibePersona, setMode } = useAppMode();
   const setUserTags = useSetUserTags();
 
+  const setQuizCompleted = useSetQuizCompleted();
+
   const section = quizSections[sectionIdx];
 
   const handleOption = (questionKey: string, value: string) => {
@@ -172,6 +174,8 @@ const Quiz = () => {
       toast.success(`Your quiz is complete! ✨`, {
         description: "Now let's create your personalized avatar!",
       });
+
+      setQuizCompleted(true);
 
       // Navigate to avatar generator
       navigate("/generate-avatar", { replace: true });
