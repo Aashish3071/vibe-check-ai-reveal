@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import {
@@ -89,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: "dev-user-123",
             username: "dev_user",
             name: "Development User",
-            quizCompleted: true,
+            quizCompleted: true, // Default to true so new users are directed to the quiz
             preferences: {
               theme: "system",
               notifications: true,
@@ -155,20 +156,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
 
-        // Create a mock user from the Supabase user for now
-        // In a real app, you'd fetch user data from your database
+        // Create a user from the Supabase user
         if (data.session?.user) {
-          const mockUser: User = {
+          const newUser: User = {
             id: data.session.user.id,
             username: data.session.user.email || "",
             name: data.session.user.email?.split("@")[0] || "",
-            quizCompleted: true, // Default to true for now
+            quizCompleted: false, // Default to false so new users are directed to quiz
             preferences: {
               theme: "system",
               notifications: true,
             },
           };
-          setUser(mockUser);
+          setUser(newUser);
         } else {
           setUser(null);
         }
@@ -192,21 +192,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log("Auth state changed:", event, newSession?.user?.email);
       setSession(newSession);
 
       // Update user state when session changes
       if (newSession?.user) {
-        const mockUser: User = {
+        const newUser: User = {
           id: newSession.user.id,
           username: newSession.user.email || "",
           name: newSession.user.email?.split("@")[0] || "",
-          quizCompleted: true, // Default to true for now
+          quizCompleted: false, // Default to false so new users are directed to quiz
           preferences: {
             theme: "system",
             notifications: true,
           },
         };
-        setUser(mockUser);
+        setUser(newUser);
       } else {
         setUser(null);
       }
@@ -242,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setQuizCompleted = (completed: boolean) => {
     if (user) {
       setUser({ ...user, quizCompleted: completed });
+      console.log("Quiz completed set to:", completed);
     }
   };
 
@@ -274,6 +276,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         return;
       }
+      console.log("Login successful:", data);
       // Auth state will be updated by the onAuthStateChange listener
     } catch (err) {
       const error = err as Error;
@@ -309,15 +312,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (isMockSupabase) {
         console.log("Using mock mode - simulating successful signup");
         toast.success("Account created in development mode!");
-        // We can auto-login in dev mode
+        // We can auto-login in dev mode - this will trigger the auth state change
         await login(email, password);
       } else {
         console.log("Real Supabase mode - email verification required");
-        // For real Supabase, the user needs to verify their email
-        toast.success("Please check your email to verify your account", {
-          description: "A verification link has been sent to your email",
+        // For real Supabase, auto-login after signup since email verification isn't required yet
+        await login(email, password);
+        
+        toast.success("Account created successfully!", {
+          description: "Welcome to HeartCheck AI!",
         });
       }
+      
+      return data;
     } catch (err) {
       const error = err as Error;
       console.error("Signup exception:", error);

@@ -114,6 +114,9 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Check if we're using a mock Supabase client (when URLs aren't properly set)
+export const isMockSupabase = supabaseUrl === "" || supabaseKey === "";
+
 // Auth functions
 export async function signUp(
   email: string,
@@ -275,24 +278,48 @@ export async function getUserSession() {
 
 // User profile functions
 export async function getUserProfile() {
-  const { data: session } = await supabase.auth.getSession();
+  try {
+    // Mock data for development when using mock Supabase
+    if (isMockSupabase) {
+      console.log("Development mode: Simulating getUserProfile");
+      const mockProfile = {
+        id: "dev-user-123",
+        username: "dev_user",
+        full_name: "Development User",
+        avatar_url: null,
+        persona_type: "dating",
+        preferences: { theme: "dark" },
+        streak_count: 5,
+        last_active: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      return { profile: mockProfile as User, error: null };
+    }
 
-  if (!session.session?.user) {
-    return { profile: null };
+    const { data: session } = await supabase.auth.getSession();
+
+    if (!session.session?.user) {
+      return { profile: null, error: "Not authenticated" };
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.session.user.id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching user profile:", error);
+      return { profile: null, error: error.message };
+    }
+
+    return { profile: data as User };
+  } catch (err) {
+    const error = err as Error;
+    console.error("Unexpected error:", error.message);
+    return { profile: null, error: error.message };
   }
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", session.session.user.id)
-    .single();
-
-  if (error) {
-    console.error("Error fetching user profile:", error);
-    return { profile: null };
-  }
-
-  return { profile: data as User };
 }
 
 export async function updateUserProfile(profile: Partial<User>) {
