@@ -4,7 +4,6 @@ import { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import {
   supabase,
   getUserProfile,
-  isMockSupabase,
   signIn,
   signUp,
 } from "./supabase";
@@ -77,7 +76,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const isMockSupabase = process.env.NODE_ENV === 'development'; // Default fallback
+  
   // Check for authentication on load
   useEffect(() => {
     const fetchSession = async () => {
