@@ -25,15 +25,16 @@ import { Loader2 } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup, isPending, error, isAuthenticated } = useAuth();
+  const { login, signup, isPending, error, isAuthenticated, user } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to quiz", { user });
       navigate("/quiz", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -66,8 +67,10 @@ const Auth = () => {
       toast.success("Welcome back!", {
         description: "Get ready to decode those relationships",
       });
+      // The redirection will be handled by the useEffect above
     } catch (error) {
       // Error handling is done by the store
+      console.error("Login error:", error);
     }
   };
 
@@ -102,12 +105,14 @@ const Auth = () => {
     }
 
     try {
-      await signup(signupData.email, signupData.name, signupData.password);
+      const result = await signup(signupData.email, signupData.name, signupData.password);
+      console.log("Signup result:", result);
       toast.success("Account created!", {
         description: "Let's start decoding your relationships",
       });
+      // The redirection will be handled by the useEffect above
     } catch (error) {
-      // Error handling is done by the store
+      console.error("Signup error:", error);
     }
   };
 

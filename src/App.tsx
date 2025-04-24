@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/common/components/ui/toaster";
 import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
@@ -67,29 +68,29 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Route that conditionally shows quiz or redirects to appropriate dashboard
 const QuizRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
   const { mode } = useAppMode();
 
+  console.log("QuizRoute - isLoading:", isLoading);
   console.log("QuizRoute - isAuthenticated:", isAuthenticated);
   console.log("QuizRoute - isQuizCompleted:", isQuizCompleted);
 
-  // If already completed quiz, redirect to the avatar generator or appropriate dashboard
-  if (isAuthenticated && isQuizCompleted) {
-    console.log("QuizRoute - Quiz completed, redirecting to dashboard");
-    // User has already completed quiz, send to appropriate dashboard
-    return (
-      <Navigate
-        to={mode === "dating" ? "/decode-vibe" : "/mood-check"}
-        replace
-      />
-    );
+  // If still loading authentication state, show nothing or a loading spinner
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {
     console.log("QuizRoute - Not authenticated, redirecting to auth");
     return <Navigate to="/auth" replace />;
+  }
+
+  // If already completed quiz, redirect to the avatar generator or appropriate dashboard
+  if (isAuthenticated && isQuizCompleted) {
+    console.log("QuizRoute - Quiz completed, redirecting to avatar generator");
+    return <Navigate to="/generate-avatar" replace />;
   }
 
   console.log("QuizRoute - Showing quiz");
@@ -99,8 +100,16 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Route specifically for avatar generation after quiz
 const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
+
+  console.log("AvatarRoute - isAuthenticated:", isAuthenticated);
+  console.log("AvatarRoute - isQuizCompleted:", isQuizCompleted);
+
+  // If still loading, show nothing
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {

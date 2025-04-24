@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/common/components/Header";
 import { Button } from "@/common/components/ui/button";
 import { useAppMode, VibePersona } from "@/common/lib/appMode";
 import { useSetQuizCompleted, useSetUserTags } from "@/common/lib/auth";
@@ -134,8 +134,12 @@ const Quiz = () => {
   const [responses, setResponses] = useState<{ [key: string]: string }>({});
   const { setVibePersona, setMode } = useAppMode();
   const setUserTags = useSetUserTags();
-
   const setQuizCompleted = useSetQuizCompleted();
+
+  // Add console logs to debug
+  useEffect(() => {
+    console.log("Quiz component mounted");
+  }, []);
 
   const section = quizSections[sectionIdx];
 
@@ -149,35 +153,56 @@ const Quiz = () => {
   const sectionDone = section.questions.every((q) => responses[q.key]);
 
   const handleNext = () => {
+    console.log("handleNext called, current sectionIdx:", sectionIdx);
+    
     if (sectionIdx < quizSections.length - 1) {
       setSectionIdx(sectionIdx + 1);
     } else {
+      console.log("Quiz completed, processing results");
+      
       // Determine vibe persona and default mode
       const persona = determineVibePersona(responses);
       const defaultMode = determineDefaultMode(responses);
+      console.log("Determined persona:", persona, "and mode:", defaultMode);
 
       // Set app mode preferences
       setVibePersona(persona);
       setMode(defaultMode);
 
       // Set user tags based on quiz responses
+      const attachmentStyle = determineAttachmentStyle(responses);
+      const tonePreference = determineTonePreference(responses);
+      
+      console.log("Setting user tags:", {
+        emotionalVibe: persona,
+        attachmentStyle,
+        tonePref: tonePreference
+      });
+      
       setUserTags({
         emotionalVibe: persona,
-        attachmentStyle: determineAttachmentStyle(responses),
-        tonePref: determineTonePreference(responses),
+        attachmentStyle,
+        tonePref: tonePreference,
       });
 
       // Save quiz answers to session storage for reference
       window.sessionStorage.setItem("hcQuizResults", JSON.stringify(responses));
+
+      // Mark quiz as completed
+      console.log("Setting quiz completed to true");
+      if (setQuizCompleted) {
+        setQuizCompleted(true);
+      } else {
+        console.error("setQuizCompleted function is undefined!");
+      }
 
       // Show success message
       toast.success(`Your quiz is complete! ✨`, {
         description: "Now let's create your personalized avatar!",
       });
 
-      setQuizCompleted(true);
-
       // Navigate to avatar generator
+      console.log("Navigating to avatar generator");
       navigate("/generate-avatar", { replace: true });
     }
   };
@@ -214,8 +239,7 @@ const Quiz = () => {
 
   return (
     <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col">
-      <Header />
-      <main className="container px-4 mx-auto max-w-md flex-1 flex flex-col items-center">
+      <div className="container px-4 mx-auto max-w-md flex-1 flex flex-col items-center">
         <div className="bg-white/80 dark:bg-gray-900/60 p-8 mt-6 rounded-xl shadow-lg w-full animate-fade-in">
           <h2 className="text-xl font-bold mb-2">{section.title}</h2>
           <div className="space-y-7">
@@ -230,7 +254,7 @@ const Quiz = () => {
                         ${
                           responses[q.key] === opt
                             ? "from-purple-400 to-pink-400 text-white font-bold border-2 border-purple-600"
-                            : "from-purple-100 to-pink-100 text-black/80"
+                            : "from-purple-100 to-pink-100 text-black/80 dark:from-purple-900/50 dark:to-pink-900/50 dark:text-white/80"
                         }
                         hover:scale-105 transition-all duration-100`}
                       onClick={() => handleOption(q.key, opt)}
@@ -261,7 +285,7 @@ const Quiz = () => {
             </Button>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

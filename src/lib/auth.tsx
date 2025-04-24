@@ -1,7 +1,15 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import { supabase, getUserProfile } from "./supabase";
+import {
+  supabase,
+  getUserProfile,
+  isMockSupabase,
+  signIn,
+  signUp,
+} from "./supabase";
 import type { User as UserProfile } from "./supabase";
+import { toast } from "sonner";
 
 export interface UserAvatar {
   type: string;
@@ -41,6 +49,10 @@ type AuthContextType = {
   setQuizCompleted?: (completed: boolean) => void;
   setUserAvatar?: (avatar: UserAvatar) => void;
   setUserTags?: (tags: Record<string, string>) => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, fullName: string, password: string) => Promise<void>;
+  isPending: boolean;
+  error: string | null;
 };
 
 // Create the auth context
@@ -51,6 +63,10 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   isLoading: true,
   isAuthenticated: false,
+  login: async () => {},
+  signup: async () => {},
+  isPending: false,
+  error: null,
 });
 
 // Auth provider component
@@ -59,28 +75,100 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Check for authentication on load
   useEffect(() => {
     const fetchSession = async () => {
       try {
+        // If using a mock Supabase client, use dummy data
+        if (isMockSupabase) {
+          console.log("Using mock auth data for development");
+          // Create a test user for development
+          const mockUser: User = {
+            id: "dev-user-123",
+            username: "dev_user",
+            name: "Development User",
+            quizCompleted: false, // Default to false so new users are directed to the quiz
+            preferences: {
+              theme: "system",
+              notifications: true,
+            },
+            tags: {
+              emotionalVibe: "sensitive",
+              attachmentStyle: "secure",
+              tonePref: "caring",
+            },
+          };
+          setUser(mockUser);
+
+          // Mock profile data
+          const mockProfile: UserProfile = {
+            id: "dev-user-123",
+            username: "dev_user",
+            full_name: "Development User",
+            avatar_url: null,
+            persona_type: "dating",
+            preferences: { theme: "dark" },
+            streak_count: 5,
+            last_active: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          setProfile(mockProfile);
+
+          // Mock session data
+          setSession({
+            access_token: "mock-token",
+            refresh_token: "mock-refresh-token",
+            token_type: "bearer",
+            expires_at: Date.now() + 3600,
+            expires_in: 3600,
+            provider_token: null,
+            provider_refresh_token: null,
+            user: {
+              id: "dev-user-123",
+              app_metadata: {},
+              user_metadata: {},
+              aud: "authenticated",
+              created_at: new Date().toISOString(),
+              factors: null,
+              last_sign_in_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              role: "authenticated",
+              email: "dev@example.com",
+              phone: null,
+              confirmed_at: new Date().toISOString(),
+              email_confirmed_at: new Date().toISOString(),
+              phone_confirmed_at: null,
+              banned_until: null,
+              confirmation_sent_at: null,
+              recovery_sent_at: null,
+              identities: [],
+            },
+          } as Session);
+
+          setIsLoading(false);
+          return;
+        }
+
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
 
-        // Create a mock user from the Supabase user for now
-        // In a real app, you'd fetch user data from your database
+        // Create a user from the Supabase user
         if (data.session?.user) {
-          const mockUser: User = {
+          const newUser: User = {
             id: data.session.user.id,
             username: data.session.user.email || "",
             name: data.session.user.email?.split("@")[0] || "",
-            quizCompleted: true, // Default to true for now
+            quizCompleted: false, // Default to false so new users are directed to quiz
             preferences: {
               theme: "system",
               notifications: true,
             },
           };
-          setUser(mockUser);
+          setUser(newUser);
         } else {
           setUser(null);
         }
@@ -104,21 +192,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log("Auth state changed:", event, newSession?.user?.email);
       setSession(newSession);
 
       // Update user state when session changes
       if (newSession?.user) {
-        const mockUser: User = {
+        const newUser: User = {
           id: newSession.user.id,
           username: newSession.user.email || "",
           name: newSession.user.email?.split("@")[0] || "",
-          quizCompleted: true, // Default to true for now
+          quizCompleted: false, // Default to false so new users are directed to quiz
           preferences: {
             theme: "system",
             notifications: true,
           },
         };
-        setUser(mockUser);
+        setUser(newUser);
       } else {
         setUser(null);
       }
@@ -154,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setQuizCompleted = (completed: boolean) => {
     if (user) {
       setUser({ ...user, quizCompleted: completed });
+      console.log("Quiz completed set to:", completed);
     }
   };
 
@@ -174,6 +264,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Login function
+  const login = async (email: string, password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      const { data, error } = await signIn(email, password);
+      if (error) {
+        setError(
+          error.message || "Login failed. Please check your credentials."
+        );
+        return;
+      }
+      console.log("Login successful:", data);
+      // Auth state will be updated by the onAuthStateChange listener
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "An unexpected error occurred");
+      console.error("Login error:", error);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  // Signup function
+  const signup = async (email: string, fullName: string, password: string) => {
+    setIsPending(true);
+    setError(null);
+    try {
+      console.log("Starting signup process for:", email);
+      console.log("Using mock Supabase:", isMockSupabase);
+
+      const { data, error } = await signUp(email, password, {
+        username: email,
+        full_name: fullName,
+      });
+
+      console.log("Signup response:", { data, error });
+
+      if (error) {
+        console.error("Signup error:", error);
+        setError(error.message || "Signup failed. Please try again.");
+        return;
+      }
+
+      // In development mode with mock Supabase, we can simulate a successful signup
+      if (isMockSupabase) {
+        console.log("Using mock mode - simulating successful signup");
+        toast.success("Account created in development mode!");
+        // We can auto-login in dev mode - this will trigger the auth state change
+        await login(email, password);
+      } else {
+        console.log("Real Supabase mode - email verification required");
+        // For real Supabase, auto-login after signup since email verification isn't required yet
+        await login(email, password);
+        
+        toast.success("Account created successfully!", {
+          description: "Welcome to HeartCheck AI!",
+        });
+      }
+      
+      return data;
+    } catch (err) {
+      const error = err as Error;
+      console.error("Signup exception:", error);
+      setError(error.message || "An unexpected error occurred");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   // Authentication status
   const isAuthenticated = !!user && !!session;
 
@@ -188,6 +348,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setQuizCompleted,
     setUserAvatar,
     setUserTags,
+    login,
+    signup,
+    isPending,
+    error,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
