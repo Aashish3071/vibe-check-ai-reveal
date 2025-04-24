@@ -30,11 +30,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isMockSupabase = process.env.NODE_ENV === 'development';
 
   // Check for authentication on load
   useEffect(() => {
     const fetchSession = async () => {
       try {
+        // If using a mock Supabase client, use dummy data
+        if (isMockSupabase) {
+          console.log("Using mock auth data for development");
+          
+          // Mock session data
+          setSession({
+            access_token: "mock-token",
+            refresh_token: "mock-refresh-token",
+            token_type: "bearer",
+            expires_at: Date.now() + 3600,
+            expires_in: 3600,
+            provider_token: null,
+            provider_refresh_token: null,
+            user: {
+              id: "dev-user-123",
+              app_metadata: {},
+              user_metadata: {},
+              aud: "authenticated",
+              created_at: new Date().toISOString(),
+              factors: null,
+              last_sign_in_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              role: "authenticated",
+              email: "dev@example.com",
+              phone: null,
+              confirmed_at: new Date().toISOString(),
+              email_confirmed_at: new Date().toISOString(),
+              phone_confirmed_at: null,
+              banned_until: null,
+              confirmation_sent_at: null,
+              recovery_sent_at: null,
+              identities: [],
+            },
+          } as Session);
+          
+          setUser({
+            id: "dev-user-123",
+            app_metadata: {},
+            user_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+            factors: null,
+            last_sign_in_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            role: "authenticated",
+            email: "dev@example.com",
+            phone: null,
+            confirmed_at: new Date().toISOString(),
+            email_confirmed_at: new Date().toISOString(),
+            phone_confirmed_at: null,
+            banned_until: null,
+            confirmation_sent_at: null,
+            recovery_sent_at: null,
+            identities: [],
+          });
+          
+          setIsLoading(false);
+          return;
+        }
+
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
         setUser(data.session?.user || null);
@@ -74,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [isMockSupabase]);
 
   // Sign out function
   const signOut = async () => {
