@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 import Sparkles from "@/common/components/Sparkles";
 import { toast } from "sonner";
-import { analyzeConversation, ConversationAnalysis } from "@/common/lib/api";
+import { analyzeConversation } from "@/common/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,15 @@ import {
   DialogTrigger,
 } from "@/common/components/ui/dialog";
 import { useAuth } from "@/common/lib/auth";
+
+// Define the type locally since it's not exported by the API
+interface ConversationAnalysis {
+  sentiment: string;
+  keyInsights: string[];
+  redFlags: string[];
+  greenFlags: string[];
+  advice: string;
+}
 
 const ConversationAnalyzer = () => {
   const { user } = useAuth();

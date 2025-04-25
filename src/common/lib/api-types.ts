@@ -52,3 +52,18 @@ export interface JournalInsight {
   suggestions: string[];
   questions: string[];
 }
+
+// Add the missing type definitions
+export interface PatternAnalysis {
+  detectedPatterns: RelationshipPattern[];
+  recommendedActions: string[];
+  summary: string;
+}
+
+export interface ConversationAnalysis {
+  sentiment: string;
+  keyInsights: string[];
+  redFlags: string[];
+  greenFlags: string[];
+  advice: string;
+}

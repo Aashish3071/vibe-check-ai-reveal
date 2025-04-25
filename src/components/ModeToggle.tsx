@@ -1,6 +1,7 @@
+
 import React from "react";
 import { motion } from "framer-motion";
-import { useAppMode } from "@/lib/appMode";
+import { useAppMode } from "@/common/lib/appMode";
 import { Switch } from "@/components/ui/switch";
 import { Heart, Brain } from "lucide-react";
 import {

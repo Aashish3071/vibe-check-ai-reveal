@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Menu, Heart, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,8 @@ import {
   useUser,
   useIsAuthenticated,
   useIsQuizCompleted,
-} from "@/lib/auth";
-import { useAppMode } from "@/lib/appMode";
+} from "@/common/lib/auth";
+import { useAppMode } from "@/common/lib/appMode";
 import { useLocation, Link } from "react-router-dom";
 import {
   DropdownMenu,

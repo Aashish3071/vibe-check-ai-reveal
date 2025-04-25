@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -20,7 +21,7 @@ import {
 import Sparkles from "@/common/components/Sparkles";
 import { toast } from "sonner";
 import { Progress } from "@/common/components/ui/progress";
-import { analyzeIntent, IntentAnalysis } from "@/common/lib/api";
+import { analyzeIntent } from "@/common/lib/api";
 import { useAuth } from "@/common/lib/auth";
 import {
   Dialog,
@@ -30,6 +31,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/common/components/ui/dialog";
+import { InterestAnalysis } from "@/common/lib/api-types";
+
+// Local interface for intent analysis that matches what's used in the component
+interface IntentAnalysis {
+  interestScore: number;
+  gameLevel: string;
+  breakdown: string;
+  signals: string;
+}
 
 const IntentDetector = () => {
   const { user } = useAuth();

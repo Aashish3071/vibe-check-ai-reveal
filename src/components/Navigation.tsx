@@ -12,7 +12,7 @@ import {
   Lightbulb,
   BarChart,
 } from "lucide-react";
-import { useAppMode } from "@/lib/appMode";
+import { useAppMode } from "@/common/lib/appMode";
 
 const Navigation = () => {
   const location = useLocation();
