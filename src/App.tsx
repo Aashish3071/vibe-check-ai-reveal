@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider } from "./hooks/use-theme";
+import { ThemeProvider } from "@/common/hooks/use-theme";
 import { useIsAuthenticated, useIsQuizCompleted } from "@/common/lib/auth";
 import { useAppMode } from "@/common/lib/appMode";
 
