@@ -28,8 +28,8 @@ const Header = () => {
   const isAuthenticated = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
   const location = useLocation();
-  const { logout } = useAuth();
-  const user = useUser();
+  const { signOut } = useAuth();
+  const { user } = useUser();
   const { mode } = useAppMode();
 
   // Don't show the toggle during quiz or when not authenticated
@@ -40,7 +40,7 @@ const Header = () => {
     !location.pathname.includes("/generate-avatar");
 
   const handleLogout = () => {
-    logout();
+    signOut();
     toast.success("Logged out successfully");
   };
 

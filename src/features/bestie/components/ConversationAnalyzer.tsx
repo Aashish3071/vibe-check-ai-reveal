@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -31,15 +30,7 @@ import {
   DialogTrigger,
 } from "@/common/components/ui/dialog";
 import { useAuth } from "@/common/lib/auth";
-
-// Define the type locally since it's not exported by the API
-interface ConversationAnalysis {
-  sentiment: string;
-  keyInsights: string[];
-  redFlags: string[];
-  greenFlags: string[];
-  advice: string;
-}
+import { ConversationAnalysis } from "@/common/lib/api-types";
 
 const ConversationAnalyzer = () => {
   const { user } = useAuth();
@@ -81,7 +72,6 @@ const ConversationAnalyzer = () => {
       return;
     }
 
-    // In a real app, this would save to a database
     toast.success("Analysis saved to your profile! ✨", {
       description: "You can access it anytime in your journal",
     });
@@ -125,7 +115,7 @@ ${results.advice}
     const shareData = {
       title: "HeartCheck AI Analysis",
       text: `Check out my relationship vibe analysis from HeartCheck AI! ✨\n\n${results.sentiment}`,
-      url: "https://heartcheck.ai", // This would be your actual website URL
+      url: "https://heartcheck.ai",
     };
 
     if (navigator.share && navigator.canShare(shareData)) {
