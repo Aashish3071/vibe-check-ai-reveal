@@ -1,8 +1,9 @@
+
 import React from "react";
 import { motion } from "framer-motion";
-import Header from "@/components/Header";
-import Navigation from "@/components/Navigation";
-import { useAppMode } from "@/lib/appMode";
+import Header from "@/common/components/Header";
+import Navigation from "@/common/components/Navigation";
+import { useAppMode } from "@/common/lib/appMode";
 
 interface TherapistLayoutProps {
   children: React.ReactNode;
