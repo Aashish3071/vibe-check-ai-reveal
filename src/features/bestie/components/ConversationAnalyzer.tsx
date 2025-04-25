@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -48,7 +49,7 @@ const ConversationAnalyzer = () => {
 
     try {
       const analysis = await analyzeConversation(conversation);
-      setResults(analysis);
+      setResults(analysis as ConversationAnalysis);
       toast.success("Vibe check complete! ✨", {
         description: "Got the tea on this situation",
       });
