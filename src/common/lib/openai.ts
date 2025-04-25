@@ -1,12 +1,13 @@
+
 import { toast } from "sonner";
 import { supabase } from "./supabase";
 
 // Import types
 import type {
-  ConversationAnalysis,
-  IntentAnalysis,
-  PatternAnalysis,
-  TarotReading,
+  VibeAnalysis,
+  InterestAnalysis,
+  PatternResult,
+  TarotResult,
   JournalInsight,
 } from "./api";
 
@@ -78,7 +79,7 @@ async function logAIUsage(
 
 export async function analyzeConversationWithAI(
   conversationText: string
-): Promise<ConversationAnalysis> {
+): Promise<VibeAnalysis> {
   try {
     toast.loading("Analyzing your conversation...");
 
@@ -94,16 +95,12 @@ export async function analyzeConversationWithAI(
         {
           role: "system" as const,
           content: `You are an expert relationship analyst. Analyze the provided conversation for emotional cues, relationship dynamics, and potential red/green flags. 
-          Provide a structured analysis with sentiment, topics discussed, red flags, green flags, an overall score (0-10), practical advice, and key insights.
           Format your response as a JSON object with the following structure:
           {
-            "sentiment": "Overall emotional tone of the conversation",
-            "topics": ["Topic 1", "Topic 2", "etc"],
-            "redFlags": ["Potential issue 1", "Potential issue 2"],
-            "greenFlags": ["Positive sign 1", "Positive sign 2"],
-            "overallScore": 7.5,
-            "advice": "Practical suggestion based on the analysis",
-            "keyInsights": ["Insight 1", "Insight 2", "Insight 3"]
+            "vibe": "Overall emotional tone of the conversation",
+            "intentions": "Analysis of the person's likely intentions and level of interest",
+            "flags": "List of red and green flags in bullet point format with emoji indicators",
+            "nextMove": "Practical advice on how to proceed based on this conversation"
           }`,
         },
         {
@@ -135,23 +132,11 @@ export async function analyzeConversationWithAI(
       console.error("Error with AI analysis:", error);
 
       // Fallback to mock data if AI call fails
-      const mockAnalysis: ConversationAnalysis = {
-        sentiment: "Positive and engaging",
-        topics: ["Future plans", "Shared interests", "Personal disclosure"],
-        redFlags: ["Some inconsistencies in communication style"],
-        greenFlags: [
-          "Active listening",
-          "Validation of feelings",
-          "Respectful boundaries",
-        ],
-        overallScore: 8.5,
-        advice:
-          "Continue being authentic and open in your communication. Consider addressing the occasional mixed signals directly.",
-        keyInsights: [
-          "Strong mutual interest is evident",
-          "Communication style is respectful and engaged",
-          "There's potential for deeper emotional connection",
-        ],
+      const mockAnalysis: VibeAnalysis = {
+        vibe: "Positive and engaging",
+        intentions: "Strong mutual interest is evident. Communication style is respectful and engaged.",
+        flags: "✅ Active listening\n✅ Validation of feelings\n✅ Respectful boundaries\n🚩 Some inconsistencies in communication style",
+        nextMove: "Continue being authentic and open in your communication. Consider addressing the occasional mixed signals directly."
       };
 
       toast.dismiss();
@@ -168,7 +153,7 @@ export async function analyzeConversationWithAI(
 
 export async function analyzeIntentWithAI(
   text: string
-): Promise<IntentAnalysis> {
+): Promise<InterestAnalysis> {
   try {
     toast.loading("Decoding intentions...");
 
@@ -187,14 +172,9 @@ export async function analyzeIntentWithAI(
           Format your response as a JSON object with the following structure:
           {
             "interestScore": 7.8, // A number from 0-10 indicating level of romantic interest
-            "gamePlaying": 3.2, // A number from 0-10 indicating level of game playing/manipulation
-            "realTalk": {
-              "honesty": 8.5, // Score from 0-10
-              "directness": 7.0, // Score from 0-10
-              "vulnerability": 6.5 // Score from 0-10
-            },
-            "signals": ["Signal 1", "Signal 2", "Signal 3"], // List of behavioral signals to watch for
-            "interpretation": "A paragraph explaining what the messages reveal about the person's intentions"
+            "gameLevel": "smart flirt", // A short description with emoji of their communication style
+            "breakdown": "A paragraph explaining what the messages reveal about the person's intentions",
+            "signals": "List of behavioral signals to watch for, comma separated"
           }`,
         },
         {
@@ -226,21 +206,11 @@ export async function analyzeIntentWithAI(
       console.error("Error with AI analysis:", error);
 
       // Fallback to mock data if AI call fails
-      const mockAnalysis: IntentAnalysis = {
+      const mockAnalysis: InterestAnalysis = {
         interestScore: 7.8,
-        gamePlaying: 3.2,
-        realTalk: {
-          honesty: 8.5,
-          directness: 7.0,
-          vulnerability: 6.5,
-        },
-        signals: [
-          "Consistent response times",
-          "Asks personal questions",
-          "Shares personal details unprompted",
-        ],
-        interpretation:
-          "This person seems genuinely interested in getting to know you better. Their communication style is fairly direct with minimal game-playing. They're showing vulnerability by sharing personal details and are likely looking to establish a meaningful connection.",
+        gameLevel: "🧠 smart flirt",
+        breakdown: "This person seems genuinely interested in getting to know you better. Their communication style is fairly direct with minimal game-playing.",
+        signals: "Consistent response times, asks personal questions, shares personal details unprompted"
       };
 
       toast.dismiss();
@@ -257,7 +227,7 @@ export async function analyzeIntentWithAI(
 
 export async function analyzePatternsWithAI(
   text: string
-): Promise<PatternAnalysis> {
+): Promise<PatternResult> {
   try {
     toast.loading("Recognizing patterns...");
 
@@ -281,8 +251,7 @@ export async function analyzePatternsWithAI(
                 "description": "Description of the pattern",
                 "frequency": 85, // A number from 0-100 indicating how frequently this appears
                 "impact": "positive" // One of: "positive", "negative", "neutral"
-              },
-              // Additional patterns...
+              }
             ],
             "recommendedActions": ["Action 1", "Action 2", "Action 3"],
             "summary": "A paragraph summarizing the overall pattern analysis"
@@ -317,7 +286,7 @@ export async function analyzePatternsWithAI(
       console.error("Error with AI analysis:", error);
 
       // Fallback to mock data if AI call fails
-      const mockAnalysis: PatternAnalysis = {
+      const mockAnalysis: PatternResult = {
         detectedPatterns: [
           {
             name: "Active Listener",
@@ -364,7 +333,7 @@ export async function analyzePatternsWithAI(
 
 export async function generateTarotReadingWithAI(
   question: string
-): Promise<TarotReading> {
+): Promise<TarotResult> {
   try {
     toast.loading("Consulting the cards...");
 
@@ -388,8 +357,7 @@ export async function generateTarotReadingWithAI(
                 "position": "Position (e.g., Present, Challenge, Future)",
                 "imageUrl": "/tarot/card-name.jpg", // Placeholder URL
                 "interpretation": "Interpretation of this card in this position"
-              },
-              // Two more cards...
+              }
             ],
             "overallReading": "A paragraph providing an overall interpretation of all three cards together",
             "loveForecast": "A brief forecast for love/relationships based on the reading"
@@ -424,7 +392,7 @@ export async function generateTarotReadingWithAI(
       console.error("Error with AI analysis:", error);
 
       // Fallback to mock data if AI call fails
-      const mockReading: TarotReading = {
+      const mockReading: TarotResult = {
         cards: [
           {
             name: "The Lovers",

@@ -1,53 +1,35 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { useAppMode } from "@/common/lib/appMode";
-import { Switch } from "@/common/components/ui/switch";
-import { Heart, Brain } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/common/components/ui/tooltip";
 
-const ModeToggle: React.FC = () => {
-  const { mode, toggleMode } = useAppMode();
-  const isDating = mode === "dating";
+import React from "react";
+import { Button } from "@/common/components/ui/button";
+import { useAppMode, AppMode } from "@/common/lib/appMode";
+import { Heart, Brain } from "lucide-react";
+
+const ModeToggle = () => {
+  const { mode, setMode } = useAppMode();
+
+  const toggleMode = () => {
+    setMode(mode === "dating" ? "therapist" : "dating");
+  };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center">
-            <Switch
-              checked={!isDating}
-              onCheckedChange={toggleMode}
-              className={`${
-                isDating
-                  ? "bg-gradient-to-r from-purple-400 to-pink-400"
-                  : "bg-gradient-to-r from-green-400 to-teal-400"
-              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-            />
-            <motion.div
-              className="absolute ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-md"
-              animate={{
-                x: isDating ? 0 : 20,
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            >
-              {isDating ? (
-                <Heart className="h-3 w-3 text-pink-500" />
-              ) : (
-                <Brain className="h-3 w-3 text-teal-500" />
-              )}
-            </motion.div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p>Switch to {isDating ? "Therapist" : "Dating"} Bestie</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={toggleMode}
+      className="flex items-center gap-1.5 px-3 py-1.5 h-9 rounded-full border border-purple-200 dark:border-purple-800"
+    >
+      {mode === "dating" ? (
+        <>
+          <Heart className="h-3.5 w-3.5 text-pink-500 fill-pink-500" />
+          <span className="text-xs">Switch to Therapist</span>
+        </>
+      ) : (
+        <>
+          <Brain className="h-3.5 w-3.5 text-green-500" />
+          <span className="text-xs">Switch to Dating</span>
+        </>
+      )}
+    </Button>
   );
 };
 

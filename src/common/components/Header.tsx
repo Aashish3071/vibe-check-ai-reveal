@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Menu, Heart, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/common/components/ui/button";
@@ -19,16 +20,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/common/components/ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/common/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { toast } from "sonner";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
   const location = useLocation();
   const { signOut } = useAuth();
