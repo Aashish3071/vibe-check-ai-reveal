@@ -29,12 +29,14 @@ const FeatureSection = ({
   </div>
 );
 
-const DatingModeFeatures = () => (
+const TherapistModeFeatures = () => (
   <div className="flex flex-col gap-4 pt-5">
     <FeatureSection
-      emoji="💌"
-      title="Decode Vibe"
-      description="Get instant analysis on conversations and understand the emotions behind the words."
+      emoji="😌"
+      title="Mood Check-in"
+      description="Daily reflection on your emotional state to build self-awareness."
+      background="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30"
+      textColor="text-green-700 dark:text-teal-200"
     />
     <FeatureSection
       emoji="❤️"
@@ -63,35 +65,37 @@ const DatingModeFeatures = () => (
   </div>
 );
 
-const TherapistModeFeatures = () => (
+const DatingModeFeatures = () => (
   <div className="flex flex-col gap-4 pt-5">
     <FeatureSection
-      emoji="😌"
-      title="Mood Check-in"
-      description="Daily reflection on your emotional state to build self-awareness."
+      emoji="💌"
+      title="Decode Vibe"
+      description="Get instant analysis on conversations and understand the emotions behind the words."
+      background="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30"
+      textColor="text-purple-700 dark:text-pink-200"
     />
     <FeatureSection
-      emoji="💡"
-      title="Self-Coaching"
-      description="Get gentle guidance for emotional challenges you're facing."
+      emoji="❤️"
+      title="Intent Detector"
+      description="Figure out if someone's truly interested in you or just playing games."
       animationDelay={100}
     />
     <FeatureSection
-      emoji="📊"
-      title="Pattern Tracker"
-      description="Identify emotional and behavioral patterns to support your growth."
+      emoji="🔄"
+      title="Pattern Recognizer"
+      description="Identify your recurring relationship patterns to break toxic cycles."
       animationDelay={180}
     />
     <FeatureSection
-      emoji="📓"
-      title="Prompted Journal"
-      description="Guided journaling for self-discovery and emotional processing."
+      emoji="✨"
+      title="Tarot Mode"
+      description="Get mystical insights about your romantic situation from the cards."
       animationDelay={260}
     />
     <FeatureSection
-      emoji="⏱️"
-      title="Timeline View"
-      description="Track your emotional growth journey over time with insights."
+      emoji="📝"
+      title="Love Journal"
+      description="Track your emotional growth and relationship history over time."
       animationDelay={340}
     />
   </div>

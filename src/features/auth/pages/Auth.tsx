@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/common/lib/auth";
@@ -22,28 +21,23 @@ import { toast } from "sonner";
 import Sparkles from "@/common/components/Sparkles";
 import { Loader2 } from "lucide-react";
 
-// Navigation intentionally omitted pre-login
-
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup, isPending, error, isAuthenticated, user } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      console.log("User is authenticated, redirecting to quiz", { user });
+    if (isAuthenticated && user) {
+      console.log("Redirecting authenticated user to quiz", { user });
       navigate("/quiz", { replace: true });
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, user, navigate]);
 
-  // Login form state
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
   });
 
-  // Signup form state
   const [signupData, setSignupData] = useState({
     email: "",
     name: "",
@@ -51,7 +45,6 @@ const Auth = () => {
     confirmPassword: "",
   });
 
-  // Validation
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -68,9 +61,7 @@ const Auth = () => {
       toast.success("Welcome back!", {
         description: "Get ready to decode those relationships",
       });
-      // The redirection will be handled by the useEffect above
     } catch (error) {
-      // Error handling is done by the store
       console.error("Login error:", error);
     }
   };
@@ -88,7 +79,6 @@ const Auth = () => {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(signupData.email)) {
       setValidationError("Please enter a valid email address");
@@ -109,19 +99,13 @@ const Auth = () => {
       console.log("Starting signup for:", signupData.email);
       await signup(signupData.email, signupData.name, signupData.password);
       
-      // Force the redirection if the useEffect doesn't trigger
       toast.success("Account created!", {
         description: "Let's start decoding your relationships",
       });
       
-      // In development mode, we may need to manually navigate since
-      // the auth state might not update immediately
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Development mode - forcing navigation to quiz");
-        setTimeout(() => {
-          navigate("/quiz", { replace: true });
-        }, 500);
-      }
+      setTimeout(() => {
+        navigate("/quiz", { replace: true });
+      }, 500);
     } catch (error) {
       console.error("Signup error:", error);
     }
