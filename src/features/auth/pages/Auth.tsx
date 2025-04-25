@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/common/lib/auth";
@@ -105,12 +106,22 @@ const Auth = () => {
     }
 
     try {
-      const result = await signup(signupData.email, signupData.name, signupData.password);
-      console.log("Signup result:", result);
+      console.log("Starting signup for:", signupData.email);
+      await signup(signupData.email, signupData.name, signupData.password);
+      
+      // Force the redirection if the useEffect doesn't trigger
       toast.success("Account created!", {
         description: "Let's start decoding your relationships",
       });
-      // The redirection will be handled by the useEffect above
+      
+      // In development mode, we may need to manually navigate since
+      // the auth state might not update immediately
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Development mode - forcing navigation to quiz");
+        setTimeout(() => {
+          navigate("/quiz", { replace: true });
+        }, 500);
+      }
     } catch (error) {
       console.error("Signup error:", error);
     }

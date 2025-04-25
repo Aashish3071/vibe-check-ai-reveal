@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/common/components/ui/toaster";
 import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
@@ -48,8 +47,13 @@ const queryClient = new QueryClient();
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useIsAuthenticated();
+  const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
+
+  // If still loading authentication state, show a loading spinner
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     // Only show the login page if not authenticated
@@ -76,7 +80,7 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
   console.log("QuizRoute - isAuthenticated:", isAuthenticated);
   console.log("QuizRoute - isQuizCompleted:", isQuizCompleted);
 
-  // If still loading authentication state, show nothing or a loading spinner
+  // If still loading authentication state, show a loading spinner
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }

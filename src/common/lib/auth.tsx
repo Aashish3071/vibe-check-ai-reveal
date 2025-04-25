@@ -153,6 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        // Real Supabase implementation
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
 
@@ -312,8 +313,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (isMockSupabase) {
         console.log("Using mock mode - simulating successful signup");
         toast.success("Account created in development mode!");
-        // We can auto-login in dev mode - this will trigger the auth state change
-        await login(email, password);
+        // Auto-login in dev mode
+        const mockUser: User = {
+          id: "dev-user-" + Date.now(),
+          username: email,
+          name: fullName,
+          quizCompleted: false,
+          preferences: {
+            theme: "system",
+            notifications: true,
+          },
+        };
+        setUser(mockUser);
+        setSession({
+          access_token: "mock-token-" + Date.now(),
+          refresh_token: "mock-refresh-token",
+          token_type: "bearer",
+          expires_at: Date.now() + 3600,
+          expires_in: 3600,
+          provider_token: null,
+          provider_refresh_token: null,
+          user: {
+            id: mockUser.id,
+            app_metadata: {},
+            user_metadata: { full_name: fullName },
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+            factors: null,
+            last_sign_in_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            role: "authenticated",
+            email: email,
+            phone: null,
+            confirmed_at: new Date().toISOString(),
+            email_confirmed_at: new Date().toISOString(),
+            phone_confirmed_at: null,
+            banned_until: null,
+            confirmation_sent_at: null,
+            recovery_sent_at: null,
+            identities: [],
+          },
+        } as Session);
       } else {
         console.log("Real Supabase mode - email verification required");
         // For real Supabase, auto-login after signup since email verification isn't required yet
@@ -329,6 +369,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const error = err as Error;
       console.error("Signup exception:", error);
       setError(error.message || "An unexpected error occurred");
+      throw error;
     } finally {
       setIsPending(false);
     }
