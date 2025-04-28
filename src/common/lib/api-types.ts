@@ -1,12 +1,12 @@
-
 // Types for the HeartCheck AI API
 
 // Conversation Analysis
 export interface VibeAnalysis {
-  vibe: string;
-  intentions: string;
-  flags: string;
-  nextMove: string;
+  sentiment: string;
+  keyInsights: string[];
+  redFlags: string[];
+  greenFlags: string[];
+  advice: string;
 }
 
 // Intent Detection

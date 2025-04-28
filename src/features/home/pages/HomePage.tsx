@@ -1,8 +1,9 @@
 import React from "react";
 import Header from "@/common/components/Header";
 import { Button } from "@/common/components/ui/button";
-import { Sparkles, Heart, BrainCircuit, Lightbulb, Smile } from "lucide-react";
+import { Sparkles, Heart, BrainCircuit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import FeatureSection from "./FeatureSection";
 
 const FeatureSection = ({
   emoji,
@@ -35,8 +36,6 @@ const TherapistModeFeatures = () => (
       emoji="😌"
       title="Mood Check-in"
       description="Daily reflection on your emotional state to build self-awareness."
-      background="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30"
-      textColor="text-green-700 dark:text-teal-200"
     />
     <FeatureSection
       emoji="❤️"
@@ -71,8 +70,6 @@ const DatingModeFeatures = () => (
       emoji="💌"
       title="Decode Vibe"
       description="Get instant analysis on conversations and understand the emotions behind the words."
-      background="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30"
-      textColor="text-purple-700 dark:text-pink-200"
     />
     <FeatureSection
       emoji="❤️"
