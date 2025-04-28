@@ -1,3 +1,4 @@
+
 // Types for the HeartCheck AI API
 
 // Conversation Analysis
@@ -8,6 +9,9 @@ export interface VibeAnalysis {
   greenFlags: string[];
   advice: string;
 }
+
+// Make ConversationAnalysis inherit from VibeAnalysis for compatibility
+export interface ConversationAnalysis extends VibeAnalysis {}
 
 // Intent Detection
 export interface InterestAnalysis {
@@ -53,17 +57,9 @@ export interface JournalInsight {
   questions: string[];
 }
 
-// Add the missing type definitions
+// Pattern Analysis
 export interface PatternAnalysis {
   detectedPatterns: RelationshipPattern[];
   recommendedActions: string[];
   summary: string;
-}
-
-export interface ConversationAnalysis {
-  sentiment: string;
-  keyInsights: string[];
-  redFlags: string[];
-  greenFlags: string[];
-  advice: string;
 }

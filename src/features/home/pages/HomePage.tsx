@@ -1,34 +1,10 @@
+
 import React from "react";
 import Header from "@/common/components/Header";
 import { Button } from "@/common/components/ui/button";
 import { Sparkles, Heart, BrainCircuit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 import FeatureSection from "./FeatureSection";
-
-const FeatureSection = ({
-  emoji,
-  title,
-  description,
-  animationDelay = 0,
-}: {
-  emoji: string;
-  title: string;
-  description: string;
-  animationDelay?: number;
-}) => (
-  <div
-    className="flex items-start gap-2 animate-fade-in"
-    style={{ animationDelay: `${animationDelay}ms` }}
-  >
-    <span className="text-3xl">{emoji}</span>
-    <div>
-      <p className="font-semibold text-base text-purple-700 dark:text-pink-200">
-        {title}
-      </p>
-      <p className="text-xs text-muted-foreground mt-1">{description}</p>
-    </div>
-  </div>
-);
 
 const TherapistModeFeatures = () => (
   <div className="flex flex-col gap-4 pt-5">

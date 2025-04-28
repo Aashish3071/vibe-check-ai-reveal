@@ -48,6 +48,7 @@ const ConversationAnalyzer = () => {
     setIsAnalyzing(true);
 
     try {
+      // Cast the result to ConversationAnalysis since we know the structure matches
       const analysis = await analyzeConversation(conversation);
       setResults(analysis as ConversationAnalysis);
       toast.success("Vibe check complete! ✨", {
