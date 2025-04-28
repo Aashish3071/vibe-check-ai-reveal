@@ -76,29 +76,32 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
   const isQuizCompleted = useIsQuizCompleted();
   const { mode } = useAppMode();
 
-  console.log("QuizRoute - isLoading:", isLoading);
-  console.log("QuizRoute - isAuthenticated:", isAuthenticated);
-  console.log("QuizRoute - isQuizCompleted:", isQuizCompleted);
+  // Add error boundary for debugging
+  console.log("QuizRoute - Auth Status:", { isLoading, isAuthenticated, isQuizCompleted });
 
-  // If still loading authentication state, show a loading spinner
+  // Show loading state while checking auth
   if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Loading your vibe...</p>
+        </div>
+      </div>
+    );
   }
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {
-    console.log("QuizRoute - Not authenticated, redirecting to auth");
     return <Navigate to="/auth" replace />;
   }
 
-  // If already completed quiz, redirect to the avatar generator or appropriate dashboard
-  if (isAuthenticated && isQuizCompleted) {
-    console.log("QuizRoute - Quiz completed, redirecting to avatar generator");
+  // If quiz is completed, redirect to avatar generator
+  if (isQuizCompleted) {
     return <Navigate to="/generate-avatar" replace />;
   }
 
-  console.log("QuizRoute - Showing quiz");
-  // Show the quiz with showNavigation=false
+  // Show the quiz
   return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
 };
 

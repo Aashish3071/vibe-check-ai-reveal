@@ -1,24 +1,36 @@
 
 // Types for the HeartCheck AI API
 
-// Conversation Analysis
-export interface VibeAnalysis {
+// Shared base analysis type
+interface BaseAnalysis {
   sentiment: string;
+  advice: string;
+  timestamp: string;
+}
+
+// Conversation Analysis
+export interface VibeAnalysis extends BaseAnalysis {
   keyInsights: string[];
   redFlags: string[];
   greenFlags: string[];
-  advice: string;
 }
 
 // Make ConversationAnalysis inherit from VibeAnalysis for compatibility
 export interface ConversationAnalysis extends VibeAnalysis {}
 
 // Intent Detection
-export interface InterestAnalysis {
+export interface InterestAnalysis extends BaseAnalysis {
   interestScore: number;
   gameLevel: string;
   breakdown: string;
   signals: string;
+}
+
+// Hype Check
+export interface HypeCheck extends BaseAnalysis {
+  affirmations: string[];
+  boundaries: string[];
+  selfWorthReminders: string[];
 }
 
 // Pattern Recognition
@@ -29,7 +41,7 @@ export interface RelationshipPattern {
   frequency: number;
 }
 
-export interface PatternResult {
+export interface PatternResult extends BaseAnalysis {
   detectedPatterns: RelationshipPattern[];
   recommendedActions: string[];
   summary: string;
@@ -43,23 +55,46 @@ export interface TarotCard {
   interpretation: string;
 }
 
-export interface TarotResult {
+export interface TarotResult extends BaseAnalysis {
   cards: TarotCard[];
   overallReading: string;
   loveForecast: string;
 }
 
 // Journal Analysis
-export interface JournalInsight {
+export interface JournalInsight extends BaseAnalysis {
   moodAnalysis: string;
   patterns: string[];
   suggestions: string[];
   questions: string[];
 }
 
-// Pattern Analysis
-export interface PatternAnalysis {
-  detectedPatterns: RelationshipPattern[];
-  recommendedActions: string[];
-  summary: string;
+// Mood Check
+export interface MoodCheck extends BaseAnalysis {
+  currentMood: string;
+  bodyAwareness: string[];
+  thoughtPatterns: string[];
+  copingStrategies: string[];
 }
+
+// Cognitive Distortion Analysis
+export interface CognitiveDistortion {
+  type: string;
+  description: string;
+  examples: string[];
+  reframeScript: string;
+}
+
+export interface DistortionAnalysis extends BaseAnalysis {
+  detectedDistortions: CognitiveDistortion[];
+  healthierPerspectives: string[];
+}
+
+// Grounding Exercise
+export interface GroundingExercise {
+  name: string;
+  duration: string;
+  steps: string[];
+  benefits: string[];
+}
+

@@ -1,4 +1,3 @@
-
 import React from "react";
 import Header from "@/common/components/Header";
 import { Button } from "@/common/components/ui/button";
@@ -10,32 +9,38 @@ const TherapistModeFeatures = () => (
   <div className="flex flex-col gap-4 pt-5">
     <FeatureSection
       emoji="😌"
-      title="Mood Check-in"
-      description="Daily reflection on your emotional state to build self-awareness."
+      title="Mood Check-In"
+      description="How's your mind and body really feeling today? Let's notice neutrally."
     />
     <FeatureSection
       emoji="❤️"
-      title="Intent Detector"
-      description="Figure out if someone's truly interested in you or just playing games."
+      title="Intent Reality Check"
+      description="Is their behavior matching their words? Honesty first."
       animationDelay={100}
+    />
+    <FeatureSection
+      emoji="🔍"
+      title="Cognitive Distortion Finder"
+      description="Are you catastrophizing, mind-reading, etc? Let's catch it gently."
+      animationDelay={180}
     />
     <FeatureSection
       emoji="🔄"
       title="Pattern Recognizer"
-      description="Identify your recurring relationship patterns to break toxic cycles."
-      animationDelay={180}
-    />
-    <FeatureSection
-      emoji="✨"
-      title="Tarot Mode"
-      description="Get mystical insights about your romantic situation from the cards."
+      description="Deep dive: Your emotional cycles, attachment wounds, healing arcs."
       animationDelay={260}
     />
     <FeatureSection
-      emoji="📝"
-      title="Love Journal"
-      description="Track your emotional growth and relationship history over time."
+      emoji="📔"
+      title="Growth Journal"
+      description="Reflect on your behaviors, not just your feelings in therapy mode."
       animationDelay={340}
+    />
+    <FeatureSection
+      emoji="🧘"
+      title="Grounding Exercises"
+      description="Mini mental reset when emotions spike."
+      animationDelay={420}
     />
   </div>
 );
@@ -43,32 +48,32 @@ const TherapistModeFeatures = () => (
 const DatingModeFeatures = () => (
   <div className="flex flex-col gap-4 pt-5">
     <FeatureSection
-      emoji="💌"
-      title="Decode Vibe"
-      description="Get instant analysis on conversations and understand the emotions behind the words."
+      emoji="💬"
+      title="Decode the Vibe"
+      description="Girl, this convo is giving 🚩 vibes — protect your peace!"
     />
     <FeatureSection
       emoji="❤️"
       title="Intent Detector"
-      description="Figure out if someone's truly interested in you or just playing games."
+      description="Are they obsessed with you or playing games? Real talk only."
       animationDelay={100}
     />
     <FeatureSection
-      emoji="🔄"
-      title="Pattern Recognizer"
-      description="Identify your recurring relationship patterns to break toxic cycles."
+      emoji="👯‍♀️"
+      title="Hype Check"
+      description="Reminder of your worth when people act shady."
       animationDelay={180}
     />
     <FeatureSection
       emoji="✨"
       title="Tarot Mode"
-      description="Get mystical insights about your romantic situation from the cards."
+      description="Fun, fictional card pull to gas you up or warn you."
       animationDelay={260}
     />
     <FeatureSection
-      emoji="📝"
+      emoji="📔"
       title="Love Journal"
-      description="Track your emotional growth and relationship history over time."
+      description="Rant, rave, spill — Bestie keeps it safe."
       animationDelay={340}
     />
   </div>
