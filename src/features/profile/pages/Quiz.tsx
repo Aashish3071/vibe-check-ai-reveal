@@ -135,10 +135,18 @@ const Quiz = () => {
   const { setVibePersona, setMode } = useAppMode();
   const setUserTags = useSetUserTags();
   const setQuizCompleted = useSetQuizCompleted();
+  const [loading, setLoading] = useState(true);
 
-  // Add console logs to debug
+  // Add enhanced debugging and initialization
   useEffect(() => {
     console.log("Quiz component mounted");
+    // Give time for auth state to initialize - helps with dev mode
+    const timer = setTimeout(() => {
+      setLoading(false);
+      console.log("Quiz initial loading set to false");
+    }, 1000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const section = quizSections[sectionIdx];
@@ -150,7 +158,7 @@ const Quiz = () => {
     }));
   };
 
-  const sectionDone = section.questions.every((q) => responses[q.key]);
+  const sectionDone = section?.questions.every((q) => responses[q.key]) || false;
 
   const handleNext = () => {
     console.log("handleNext called, current sectionIdx:", sectionIdx);
@@ -179,11 +187,15 @@ const Quiz = () => {
         tonePref: tonePreference
       });
       
-      setUserTags({
-        emotionalVibe: persona,
-        attachmentStyle,
-        tonePref: tonePreference,
-      });
+      if (setUserTags) {
+        setUserTags({
+          emotionalVibe: persona,
+          attachmentStyle,
+          tonePref: tonePreference,
+        });
+      } else {
+        console.error("setUserTags function is undefined!");
+      }
 
       // Save quiz answers to session storage for reference
       window.sessionStorage.setItem("hcQuizResults", JSON.stringify(responses));
@@ -237,13 +249,25 @@ const Quiz = () => {
     }
   };
 
+  // Show loading state while initializing
+  if (loading) {
+    return (
+      <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Loading your vibe...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col">
       <div className="container px-4 mx-auto max-w-md flex-1 flex flex-col items-center">
         <div className="bg-white/80 dark:bg-gray-900/60 p-8 mt-6 rounded-xl shadow-lg w-full animate-fade-in">
-          <h2 className="text-xl font-bold mb-2">{section.title}</h2>
+          <h2 className="text-xl font-bold mb-2">{section?.title}</h2>
           <div className="space-y-7">
-            {section.questions.map((q) => (
+            {section?.questions.map((q) => (
               <div key={q.key}>
                 <p className="font-semibold mb-2">{q.text}</p>
                 <div className="grid grid-cols-2 gap-2">

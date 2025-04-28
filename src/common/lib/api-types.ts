@@ -8,15 +8,15 @@ interface BaseAnalysis {
   timestamp: string;
 }
 
-// Conversation Analysis
+// Conversation Analysis (Decode the Vibe)
 export interface VibeAnalysis extends BaseAnalysis {
   keyInsights: string[];
   redFlags: string[];
   greenFlags: string[];
 }
 
-// Make ConversationAnalysis inherit from VibeAnalysis for compatibility
-export interface ConversationAnalysis extends VibeAnalysis {}
+// For backwards compatibility - ConversationAnalysis is the same as VibeAnalysis
+export type ConversationAnalysis = VibeAnalysis;
 
 // Intent Detection
 export interface InterestAnalysis extends BaseAnalysis {
@@ -97,4 +97,3 @@ export interface GroundingExercise {
   steps: string[];
   benefits: string[];
 }
-

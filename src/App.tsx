@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/common/components/ui/toaster";
 import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/common/hooks/use-theme";
 import { useIsAuthenticated, useIsQuizCompleted } from "@/common/lib/auth";
 import { useAppMode } from "@/common/lib/appMode";
+import { useEffect, useState } from "react";
 
 // Common Components
 import { LayoutSwitcher, NotFound } from "@/common/components";
@@ -49,10 +51,26 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
+  const [initializing, setInitializing] = useState(true);
+
+  // Add additional initialization time to ensure auth state loads correctly
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setInitializing(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   // If still loading authentication state, show a loading spinner
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  if (isLoading || initializing) {
+    return (
+      <div className="flex items-center justify-center h-screen flex-col">
+        <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mb-4"></div>
+        <div className="text-muted-foreground">Loading your vibe...</div>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
@@ -75,12 +93,22 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
   const { mode } = useAppMode();
+  const [initializing, setInitializing] = useState(true);
 
-  // Add error boundary for debugging
-  console.log("QuizRoute - Auth Status:", { isLoading, isAuthenticated, isQuizCompleted });
+  // Add additional initialization time to ensure auth state loads correctly
+  useEffect(() => {
+    console.log("QuizRoute - Auth Status:", { isLoading, isAuthenticated, isQuizCompleted });
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setInitializing(false);
+        console.log("QuizRoute - Initialization complete");
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isAuthenticated, isQuizCompleted]);
 
   // Show loading state while checking auth
-  if (isLoading) {
+  if (isLoading || initializing) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center space-y-4">
@@ -93,14 +121,17 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
   // If not authenticated, redirect to auth
   if (!isAuthenticated) {
+    console.log("QuizRoute - Redirecting to auth (not authenticated)");
     return <Navigate to="/auth" replace />;
   }
 
   // If quiz is completed, redirect to avatar generator
   if (isQuizCompleted) {
+    console.log("QuizRoute - Redirecting to avatar generator (quiz completed)");
     return <Navigate to="/generate-avatar" replace />;
   }
 
+  console.log("QuizRoute - Showing quiz");
   // Show the quiz
   return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
 };
@@ -109,13 +140,31 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useIsAuthenticated();
   const isQuizCompleted = useIsQuizCompleted();
+  const [initializing, setInitializing] = useState(true);
 
-  console.log("AvatarRoute - isAuthenticated:", isAuthenticated);
-  console.log("AvatarRoute - isQuizCompleted:", isQuizCompleted);
+  // Add additional initialization time to ensure auth state loads correctly
+  useEffect(() => {
+    console.log("AvatarRoute - isAuthenticated:", isAuthenticated);
+    console.log("AvatarRoute - isQuizCompleted:", isQuizCompleted);
+    
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setInitializing(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isAuthenticated, isQuizCompleted]);
 
-  // If still loading, show nothing
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  // If still loading, show loading state
+  if (isLoading || initializing) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Loading your vibe...</p>
+        </div>
+      </div>
+    );
   }
 
   // If not authenticated, redirect to auth
