@@ -12,6 +12,7 @@ import { Textarea } from "@/common/components/ui/textarea";
 import { Smile, Heart, Frown, Meh, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useAchievements } from "@/common/hooks";
 
 type Mood = "great" | "good" | "neutral" | "sad" | "bad";
 
@@ -75,8 +76,9 @@ const MoodCheck = () => {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [reflection, setReflection] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { trackFeatureUsage, checkIn } = useAchievements();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedMood) {
       toast.error("Please select a mood");
       return;
@@ -86,6 +88,13 @@ const MoodCheck = () => {
     toast.success("Mood check-in saved", {
       description: "Your reflection has been recorded",
     });
+
+    // Award achievement for using mood check feature
+    await trackFeatureUsage("mood-check");
+
+    // Record daily check-in to update streak
+    await checkIn();
+
     setIsSubmitted(true);
   };
 

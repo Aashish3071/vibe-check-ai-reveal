@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/common/components/ui/button";
@@ -14,6 +13,7 @@ import {
   LineChart,
   BookOpen,
   Sparkles as SparklesIcon,
+  Award,
 } from "lucide-react";
 import { cn } from "@/common/lib/utils";
 import { useAppMode } from "@/common/lib/appMode";
@@ -50,10 +50,10 @@ const Navigation = () => {
       color: "text-purple-500",
     },
     {
-      name: "Journal",
-      href: "/journal",
-      icon: <ScrollText className="w-5 h-5" />,
-      color: "text-pink-500",
+      name: "Progress",
+      href: "/achievements",
+      icon: <Award className="w-5 h-5" />,
+      color: "text-green-500",
     },
   ];
 
@@ -78,16 +78,16 @@ const Navigation = () => {
       color: "text-cyan-500",
     },
     {
-      name: "Prompted Journal",
-      href: "/prompted-journal",
-      icon: <BookOpen className="w-5 h-5" />,
-      color: "text-emerald-500",
-    },
-    {
       name: "Journal",
       href: "/journal",
       icon: <ScrollText className="w-5 h-5" />,
       color: "text-green-600",
+    },
+    {
+      name: "Progress",
+      href: "/achievements",
+      icon: <Award className="w-5 h-5" />,
+      color: "text-green-500",
     },
   ];
 

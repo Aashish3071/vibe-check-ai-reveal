@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
@@ -23,10 +22,15 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
+    // console.log("Starting signup process...");
     e.preventDefault();
     setValidationError(null);
 
-    if (!signupData.email.trim() || !signupData.name.trim() || !signupData.password) {
+    if (
+      !signupData.email.trim() ||
+      !signupData.name.trim() ||
+      !signupData.password
+    ) {
       setValidationError("Please fill in all fields");
       return;
     }
@@ -47,9 +51,13 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
       return;
     }
 
+    console.log("Validation passed, proceeding with signup...");
+    console.log("Signup data:", signupData);
+    console.log("Attempting to sign up with email:", signupData.email);
+
     try {
       await signup(signupData.email, signupData.name, signupData.password);
-      navigate("/quiz");
+      // navigate("/quiz");
     } catch (error) {
       console.error("Signup error:", error);
     }

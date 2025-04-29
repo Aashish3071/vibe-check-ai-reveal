@@ -70,6 +70,30 @@ export type Pattern = {
   insights: Record<string, any> | null;
 };
 
+export type Achievement = {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  points: number;
+  created_at: string;
+};
+
+export type UserAchievement = {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  earned_at: string;
+};
+
+export type StreakHistory = {
+  id: string;
+  user_id: string;
+  check_in_date: string;
+  created_at: string;
+};
+
 // Define Database interface
 export interface Database {
   public: {
@@ -103,6 +127,21 @@ export interface Database {
         Row: Pattern;
         Insert: Omit<Pattern, "id" | "first_detected">;
         Update: Partial<Omit<Pattern, "id">>;
+      };
+      achievements: {
+        Row: Achievement;
+        Insert: Omit<Achievement, "id" | "created_at">;
+        Update: Partial<Omit<Achievement, "id">>;
+      };
+      user_achievements: {
+        Row: UserAchievement;
+        Insert: Omit<UserAchievement, "id" | "earned_at">;
+        Update: Partial<Omit<UserAchievement, "id">>;
+      };
+      streak_history: {
+        Row: StreakHistory;
+        Insert: Omit<StreakHistory, "id" | "created_at">;
+        Update: Partial<Omit<StreakHistory, "id">>;
       };
     };
   };

@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/common/components/ui/button";
 import { useAppMode, VibePersona } from "@/common/lib/appMode";
 import { useSetQuizCompleted, useSetUserTags } from "@/common/lib/auth";
 import { toast } from "sonner";
+import { useIsAuthenticated } from "@/common/lib/auth";
 
 const quizSections = [
   {
@@ -136,18 +136,35 @@ const Quiz = () => {
   const setUserTags = useSetUserTags();
   const setQuizCompleted = useSetQuizCompleted();
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading: isAuthLoading } = useIsAuthenticated();
 
   // Add enhanced debugging and initialization
   useEffect(() => {
     console.log("Quiz component mounted");
-    // Give time for auth state to initialize - helps with dev mode
-    const timer = setTimeout(() => {
-      setLoading(false);
-      console.log("Quiz initial loading set to false");
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    console.log("Auth state:", { isAuthenticated, isAuthLoading });
+
+    // Only proceed when auth is fully loaded
+    if (!isAuthLoading) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+        console.log("Quiz initial loading set to false");
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthLoading, isAuthenticated]);
+
+  // If still loading, show loading state
+  if (loading || isAuthLoading) {
+    return (
+      <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Loading your vibe...</p>
+        </div>
+      </div>
+    );
+  }
 
   const section = quizSections[sectionIdx];
 
@@ -158,16 +175,17 @@ const Quiz = () => {
     }));
   };
 
-  const sectionDone = section?.questions.every((q) => responses[q.key]) || false;
+  const sectionDone =
+    section?.questions.every((q) => responses[q.key]) || false;
 
   const handleNext = () => {
     console.log("handleNext called, current sectionIdx:", sectionIdx);
-    
+
     if (sectionIdx < quizSections.length - 1) {
       setSectionIdx(sectionIdx + 1);
     } else {
       console.log("Quiz completed, processing results");
-      
+
       // Determine vibe persona and default mode
       const persona = determineVibePersona(responses);
       const defaultMode = determineDefaultMode(responses);
@@ -180,13 +198,13 @@ const Quiz = () => {
       // Set user tags based on quiz responses
       const attachmentStyle = determineAttachmentStyle(responses);
       const tonePreference = determineTonePreference(responses);
-      
+
       console.log("Setting user tags:", {
         emotionalVibe: persona,
         attachmentStyle,
-        tonePref: tonePreference
+        tonePref: tonePreference,
       });
-      
+
       if (setUserTags) {
         setUserTags({
           emotionalVibe: persona,
@@ -248,18 +266,6 @@ const Quiz = () => {
       return "balanced";
     }
   };
-
-  // Show loading state while initializing
-  if (loading) {
-    return (
-      <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-muted-foreground">Loading your vibe...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen pb-20 pt-16 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 flex flex-col">

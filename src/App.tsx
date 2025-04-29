@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/common/components/ui/toaster";
 import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
@@ -8,6 +7,8 @@ import { ThemeProvider } from "@/common/hooks/use-theme";
 import { useIsAuthenticated, useIsQuizCompleted } from "@/common/lib/auth";
 import { useAppMode } from "@/common/lib/appMode";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/common/lib/auth";
+import { useNavigate } from "react-router-dom";
 
 // Common Components
 import { LayoutSwitcher, NotFound } from "@/common/components";
@@ -89,51 +90,55 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Route that conditionally shows quiz or redirects to appropriate dashboard
-const QuizRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useIsAuthenticated();
-  const isQuizCompleted = useIsQuizCompleted();
-  const { mode } = useAppMode();
+const QuizRoute = () => {
+  const { user, isLoading, isAuthenticated } = useAuth();
   const [initializing, setInitializing] = useState(true);
+  const navigate = useNavigate();
 
-  // Add additional initialization time to ensure auth state loads correctly
   useEffect(() => {
-    console.log("QuizRoute - Auth Status:", { isLoading, isAuthenticated, isQuizCompleted });
+    console.log("QuizRoute - Auth state:", {
+      isLoading,
+      isAuthenticated,
+      user,
+    });
+
+    // Only proceed with initialization if we're not loading
     if (!isLoading) {
       const timer = setTimeout(() => {
         setInitializing(false);
-        console.log("QuizRoute - Initialization complete");
-      }, 500);
+      }, 1000);
+
       return () => clearTimeout(timer);
     }
-  }, [isLoading, isAuthenticated, isQuizCompleted]);
+  }, [isLoading, isAuthenticated, user]);
 
-  // Show loading state while checking auth
+  // Show loading spinner while checking authentication
   if (isLoading || initializing) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center space-y-4">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-muted-foreground">Loading your vibe...</p>
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // If not authenticated, redirect to auth
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    console.log("QuizRoute - Redirecting to auth (not authenticated)");
-    return <Navigate to="/auth" replace />;
+    console.log("QuizRoute - Not authenticated, redirecting to login");
+    navigate("/login");
+    return null;
   }
 
-  // If quiz is completed, redirect to avatar generator
-  if (isQuizCompleted) {
-    console.log("QuizRoute - Redirecting to avatar generator (quiz completed)");
-    return <Navigate to="/generate-avatar" replace />;
+  // Redirect to home if quiz is completed
+  if (user?.quizCompleted) {
+    console.log("QuizRoute - Quiz completed, redirecting to home");
+    navigate("/");
+    return null;
   }
 
-  console.log("QuizRoute - Showing quiz");
-  // Show the quiz
-  return <LayoutSwitcher showNavigation={false}>{children}</LayoutSwitcher>;
+  return <Quiz />;
 };
 
 // Route specifically for avatar generation after quiz
@@ -146,7 +151,7 @@ const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log("AvatarRoute - isAuthenticated:", isAuthenticated);
     console.log("AvatarRoute - isQuizCompleted:", isQuizCompleted);
-    
+
     if (!isLoading) {
       const timer = setTimeout(() => {
         setInitializing(false);
@@ -194,14 +199,7 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
 
             {/* Quiz and Avatar Generator routes */}
-            <Route
-              path="/quiz"
-              element={
-                <QuizRoute>
-                  <Quiz />
-                </QuizRoute>
-              }
-            />
+            <Route path="/quiz" element={<QuizRoute />} />
             <Route
               path="/generate-avatar"
               element={

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -32,6 +31,7 @@ import {
 } from "@/common/components/ui/dialog";
 import { useAuth } from "@/common/lib/auth";
 import { ConversationAnalysis } from "@/common/lib/api-types";
+import { useAchievements } from "@/common/hooks";
 
 const ConversationAnalyzer = () => {
   const { user } = useAuth();

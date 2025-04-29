@@ -1,12 +1,6 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import {
-  supabase,
-  getUserProfile,
-  signIn,
-  signUp,
-} from "./supabase";
+import { supabase, getUserProfile, signIn, signUp } from "./supabase";
 import type { User as UserProfile } from "./supabase";
 import { toast } from "sonner";
 
@@ -54,7 +48,7 @@ type AuthContextType = {
   error: string | null;
 };
 
-// Create the auth context
+// Create the auth context with a default value
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
@@ -62,6 +56,9 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   isLoading: true,
   isAuthenticated: false,
+  setQuizCompleted: () => {},
+  setUserAvatar: () => {},
+  setUserTags: () => {},
   login: async () => {},
   signup: async () => {},
   isPending: false,
@@ -76,117 +73,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const isMockSupabase = process.env.NODE_ENV === 'development'; // Default fallback
-  
+  const isMockSupabase = process.env.NODE_ENV === "development";
+
   // Check for authentication on load
   useEffect(() => {
+    let mounted = true;
+
     const fetchSession = async () => {
       try {
-        // If using a mock Supabase client, use dummy data
-        if (isMockSupabase) {
-          console.log("Using mock auth data for development");
-          // Create a test user for development
-          const mockUser: User = {
-            id: "dev-user-123",
-            username: "dev_user",
-            name: "Development User",
-            quizCompleted: true, // Default to true so new users are directed to the quiz
-            preferences: {
-              theme: "system",
-              notifications: true,
-            },
-            tags: {
-              emotionalVibe: "sensitive",
-              attachmentStyle: "secure",
-              tonePref: "caring",
-            },
-          };
-          setUser(mockUser);
+        console.log("Fetching initial session...");
+        const { data, error } = await supabase.auth.getSession();
 
-          // Mock profile data
-          const mockProfile: UserProfile = {
-            id: "dev-user-123",
-            username: "dev_user",
-            full_name: "Development User",
-            avatar_url: null,
-            persona_type: "dating",
-            preferences: { theme: "dark" },
-            streak_count: 5,
-            last_active: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-          setProfile(mockProfile);
+        if (error) throw error;
 
-          // Mock session data
-          setSession({
-            access_token: "mock-token",
-            refresh_token: "mock-refresh-token",
-            token_type: "bearer",
-            expires_at: Date.now() + 3600,
-            expires_in: 3600,
-            provider_token: null,
-            provider_refresh_token: null,
-            user: {
-              id: "dev-user-123",
-              app_metadata: {},
-              user_metadata: {},
-              aud: "authenticated",
-              created_at: new Date().toISOString(),
-              factors: null,
-              last_sign_in_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              role: "authenticated",
-              email: "dev@example.com",
-              phone: null,
-              confirmed_at: new Date().toISOString(),
-              email_confirmed_at: new Date().toISOString(),
-              phone_confirmed_at: null,
-              banned_until: null,
-              confirmation_sent_at: null,
-              recovery_sent_at: null,
-              identities: [],
-            },
-          } as Session);
+        if (mounted) {
+          console.log("Session data:", data);
+          setSession(data.session);
 
-          setIsLoading(false);
-          return;
-        }
+          if (data.session?.user) {
+            const newUser: User = {
+              id: data.session.user.id,
+              username: data.session.user.email || "",
+              name: data.session.user.email?.split("@")[0] || "",
+              quizCompleted: false,
+              preferences: {
+                theme: "system",
+                notifications: true,
+              },
+            };
+            setUser(newUser);
 
-        // Real Supabase implementation
-        const { data } = await supabase.auth.getSession();
-        setSession(data.session);
-
-        // Create a user from the Supabase user
-        if (data.session?.user) {
-          const newUser: User = {
-            id: data.session.user.id,
-            username: data.session.user.email || "",
-            name: data.session.user.email?.split("@")[0] || "",
-            quizCompleted: false, // Default to false so new users are directed to quiz
-            preferences: {
-              theme: "system",
-              notifications: true,
-            },
-          };
-          setUser(newUser);
-        } else {
-          setUser(null);
-        }
-
-        // If user is authenticated, fetch their profile
-        if (data.session?.user) {
-          const { profile } = await getUserProfile();
-          setProfile(profile);
+            // Fetch user profile
+            const { profile, error: profileError } = await getUserProfile();
+            if (profileError) {
+              console.error("Error fetching profile:", profileError);
+            } else {
+              setProfile(profile);
+            }
+          } else {
+            setUser(null);
+            setProfile(null);
+          }
         }
       } catch (error) {
         console.error("Error fetching session:", error);
+        if (mounted) {
+          setError(
+            error instanceof Error ? error.message : "An error occurred"
+          );
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    // Initial session fetch
     fetchSession();
 
     // Subscribe to auth changes
@@ -194,36 +136,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       console.log("Auth state changed:", event, newSession?.user?.email);
-      setSession(newSession);
 
-      // Update user state when session changes
-      if (newSession?.user) {
-        const newUser: User = {
-          id: newSession.user.id,
-          username: newSession.user.email || "",
-          name: newSession.user.email?.split("@")[0] || "",
-          quizCompleted: false, // Default to false so new users are directed to quiz
-          preferences: {
-            theme: "system",
-            notifications: true,
-          },
-        };
-        setUser(newUser);
-      } else {
-        setUser(null);
-      }
+      if (mounted) {
+        setSession(newSession);
 
-      // Fetch user profile when auth state changes to signed in
-      if (event === "SIGNED_IN" && newSession?.user) {
-        const { profile } = await getUserProfile();
-        setProfile(profile);
-      } else if (event === "SIGNED_OUT") {
-        setProfile(null);
+        if (newSession?.user) {
+          const newUser: User = {
+            id: newSession.user.id,
+            username: newSession.user.email || "",
+            name: newSession.user.email?.split("@")[0] || "",
+            quizCompleted: false,
+            preferences: {
+              theme: "system",
+              notifications: true,
+            },
+          };
+          setUser(newUser);
+
+          // Fetch user profile when signed in
+          if (event === "SIGNED_IN") {
+            const { profile } = await getUserProfile();
+            setProfile(profile);
+          }
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
       }
     });
 
-    // Clean up subscription
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -270,19 +213,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsPending(true);
     setError(null);
     try {
-      const { data, error } = await signIn(email, password);
-      if (error) {
-        setError(
-          error.message || "Login failed. Please check your credentials."
-        );
-        return;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.session?.user) {
+        const newUser: User = {
+          id: data.session.user.id,
+          username: data.session.user.email || "",
+          name: data.session.user.email?.split("@")[0] || "",
+          quizCompleted: false,
+          preferences: {
+            theme: "system",
+            notifications: true,
+          },
+        };
+        setUser(newUser);
+        setSession(data.session);
       }
-      console.log("Login successful:", data);
-      // Auth state will be updated by the onAuthStateChange listener
     } catch (err) {
       const error = err as Error;
-      setError(error.message || "An unexpected error occurred");
-      console.error("Login error:", error);
+      setError(error.message);
+      throw error;
     } finally {
       setIsPending(false);
     }
@@ -290,89 +245,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Signup function
   const signup = async (email: string, fullName: string, password: string) => {
-    setIsPending(true);
-    setError(null);
-    try {
-      console.log("Starting signup process for:", email);
-      console.log("Using mock Supabase:", isMockSupabase);
+    console.log("Starting signup process...");
+    // setIsPending(true);
+    // setError(null);
+    // try {
+    //   console.log("Starting signup process...");
 
-      const { data, error } = await signUp(email, password, {
-        username: email,
-        full_name: fullName,
-      });
+    //   // First, sign up the user
+    //   const { data: signUpData, error: signUpError } =
+    //     await supabase.auth.signUp({
+    //       email,
+    //       password,
+    //       options: {
+    //         data: {
+    //           full_name: fullName,
+    //         },
+    //       },
+    //     });
 
-      console.log("Signup response:", { data, error });
+    //   if (signUpError) {
+    //     console.error("Signup error:", signUpError);
+    //     throw signUpError;
+    //   }
 
-      if (error) {
-        console.error("Signup error:", error);
-        setError(error.message || "Signup failed. Please try again.");
-        return;
-      }
+    //   console.log("Signup successful, data:", signUpData);
 
-      // In development mode with mock Supabase, we can simulate a successful signup
-      if (isMockSupabase) {
-        console.log("Using mock mode - simulating successful signup");
-        toast.success("Account created in development mode!");
-        // Auto-login in dev mode
-        const mockUser: User = {
-          id: "dev-user-" + Date.now(),
-          username: email,
-          name: fullName,
-          quizCompleted: false,
-          preferences: {
-            theme: "system",
-            notifications: true,
-          },
-        };
-        setUser(mockUser);
-        setSession({
-          access_token: "mock-token-" + Date.now(),
-          refresh_token: "mock-refresh-token",
-          token_type: "bearer",
-          expires_at: Date.now() + 3600,
-          expires_in: 3600,
-          provider_token: null,
-          provider_refresh_token: null,
-          user: {
-            id: mockUser.id,
-            app_metadata: {},
-            user_metadata: { full_name: fullName },
-            aud: "authenticated",
-            created_at: new Date().toISOString(),
-            factors: null,
-            last_sign_in_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            role: "authenticated",
-            email: email,
-            phone: null,
-            confirmed_at: new Date().toISOString(),
-            email_confirmed_at: new Date().toISOString(),
-            phone_confirmed_at: null,
-            banned_until: null,
-            confirmation_sent_at: null,
-            recovery_sent_at: null,
-            identities: [],
-          },
-        } as Session);
-      } else {
-        console.log("Real Supabase mode - email verification required");
-        // For real Supabase, auto-login after signup since email verification isn't required yet
-        await login(email, password);
-        
-        toast.success("Account created successfully!", {
-          description: "Welcome to HeartCheck AI!",
-        });
-      }
-      
-      return data;
-    } catch (err) {
-      const error = err as Error;
-      console.error("Signup exception:", error);
-      setError(error.message || "An unexpected error occurred");
-      throw error;
-    } finally {
-      setIsPending(false);
-    }
+    //   // If email confirmation is required, we'll wait for the user to confirm
+    //   if (signUpData.user?.identities?.length === 0) {
+    //     console.log("Email confirmation required");
+    //     return;
+    //   }
+
+    //   // If no email confirmation required, auto-login
+    //   const { data: signInData, error: signInError } =
+    //     await supabase.auth.signInWithPassword({
+    //       email,
+    //       password,
+    //     });
+
+    //   if (signInError) {
+    //     console.error("Auto-login error:", signInError);
+    //     throw signInError;
+    //   }
+
+    //   console.log("Auto-login successful, data:", signInData);
+
+    //   if (signInData.session?.user) {
+    //     const newUser: User = {
+    //       id: signInData.session.user.id,
+    //       username: signInData.session.user.email || "",
+    //       name: signInData.session.user.email?.split("@")[0] || "",
+    //       quizCompleted: false,
+    //       preferences: {
+    //         theme: "system",
+    //         notifications: true,
+    //       },
+    //     };
+    //     setUser(newUser);
+    //     setSession(signInData.session);
+    //   }
+    // } catch (err) {
+    //   const error = err as Error;
+    //   console.error("Signup process failed:", error);
+    //   setError(error.message);
+    //   throw error;
+    // } finally {
+    //   setIsPending(false);
+    // }
   };
 
   // Authentication status
@@ -399,15 +338,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 // Custom hook to use auth context
-export function useAuth(): AuthContextType {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return context;
-}
+};
 
 // Hook to check if user is authenticated
 export const useIsAuthenticated = () => {
