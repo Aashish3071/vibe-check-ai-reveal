@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
@@ -26,7 +25,11 @@ const SignupForm = ({ onSwitchToLogin }: SignupFormProps) => {
     e.preventDefault();
     setValidationError(null);
 
-    if (!signupData.email.trim() || !signupData.name.trim() || !signupData.password) {
+    if (
+      !signupData.email.trim() ||
+      !signupData.name.trim() ||
+      !signupData.password
+    ) {
       setValidationError("Please fill in all fields");
       return;
     }

@@ -10,7 +10,12 @@ import {
   CardFooter,
 } from "@/common/components/ui/card";
 import { Button } from "@/common/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/common/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/common/components/ui/dialog";
+import { ScrollArea } from "@/common/components/ui/scroll-area";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -683,7 +689,9 @@ const Journal = () => {
                   emotional growth
                 </DialogDescription>
               </DialogHeader>
-              <EntryForm onSubmit={handleAddEntry} />
+              <ScrollArea className="h-[85px] w-full rounded-md border p-4">
+                <EntryForm onSubmit={handleAddEntry} />
+              </ScrollArea>
             </DialogContent>
           </Dialog>
 

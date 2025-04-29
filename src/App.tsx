@@ -1,11 +1,14 @@
-
 import { Toaster } from "@/common/components/ui/toaster";
 import { Toaster as Sonner } from "@/common/components/ui/sonner";
 import { TooltipProvider } from "@/common/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/common/hooks/use-theme";
-import { useIsAuthenticated, useIsQuizCompleted } from "@/common/lib/auth";
+import {
+  AuthProvider,
+  useIsAuthenticated,
+  useIsQuizCompleted,
+} from "@/common/lib/auth";
 import { useAppMode } from "@/common/lib/appMode";
 import { useEffect, useState } from "react";
 
@@ -97,7 +100,11 @@ const QuizRoute = ({ children }: { children: React.ReactNode }) => {
 
   // Add additional initialization time to ensure auth state loads correctly
   useEffect(() => {
-    console.log("QuizRoute - Auth Status:", { isLoading, isAuthenticated, isQuizCompleted });
+    console.log("QuizRoute - Auth Status:", {
+      isLoading,
+      isAuthenticated,
+      isQuizCompleted,
+    });
     if (!isLoading) {
       const timer = setTimeout(() => {
         setInitializing(false);
@@ -146,7 +153,7 @@ const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log("AvatarRoute - isAuthenticated:", isAuthenticated);
     console.log("AvatarRoute - isQuizCompleted:", isQuizCompleted);
-    
+
     if (!isLoading) {
       const timer = setTimeout(() => {
         setInitializing(false);
@@ -182,128 +189,130 @@ const AvatarRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="dark">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/auth" element={<AuthPage />} />
+  <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="dark">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/auth" element={<AuthPage />} />
 
-            {/* Quiz and Avatar Generator routes */}
-            <Route
-              path="/quiz"
-              element={
-                <QuizRoute>
-                  <Quiz />
-                </QuizRoute>
-              }
-            />
-            <Route
-              path="/generate-avatar"
-              element={
-                <AvatarRoute>
-                  <AvatarGenerator />
-                </AvatarRoute>
-              }
-            />
+              {/* Quiz and Avatar Generator routes */}
+              <Route
+                path="/quiz"
+                element={
+                  <QuizRoute>
+                    <Quiz />
+                  </QuizRoute>
+                }
+              />
+              <Route
+                path="/generate-avatar"
+                element={
+                  <AvatarRoute>
+                    <AvatarGenerator />
+                  </AvatarRoute>
+                }
+              />
 
-            {/* Dating mode routes */}
-            <Route
-              path="/analyze"
-              element={
-                <ProtectedRoute>
-                  <Analyze />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/decode-vibe"
-              element={
-                <ProtectedRoute>
-                  <DecodeVibe />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/intent-detector"
-              element={
-                <ProtectedRoute>
-                  <IntentDetectorPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/pattern-recognizer"
-              element={
-                <ProtectedRoute>
-                  <PatternRecognizer />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/tarot-mode"
-              element={
-                <ProtectedRoute>
-                  <TarotMode />
-                </ProtectedRoute>
-              }
-            />
+              {/* Dating mode routes */}
+              <Route
+                path="/analyze"
+                element={
+                  <ProtectedRoute>
+                    <Analyze />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/decode-vibe"
+                element={
+                  <ProtectedRoute>
+                    <DecodeVibe />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/intent-detector"
+                element={
+                  <ProtectedRoute>
+                    <IntentDetectorPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pattern-recognizer"
+                element={
+                  <ProtectedRoute>
+                    <PatternRecognizer />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tarot-mode"
+                element={
+                  <ProtectedRoute>
+                    <TarotMode />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Therapist mode routes */}
-            <Route
-              path="/mood-check"
-              element={
-                <ProtectedRoute>
-                  <MoodCheckPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/self-coaching"
-              element={
-                <ProtectedRoute>
-                  <SelfCoaching />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/pattern-tracker"
-              element={
-                <ProtectedRoute>
-                  <PatternTracker />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/prompted-journal"
-              element={
-                <ProtectedRoute>
-                  <PromptedJournal />
-                </ProtectedRoute>
-              }
-            />
+              {/* Therapist mode routes */}
+              <Route
+                path="/mood-check"
+                element={
+                  <ProtectedRoute>
+                    <MoodCheckPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/self-coaching"
+                element={
+                  <ProtectedRoute>
+                    <SelfCoaching />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pattern-tracker"
+                element={
+                  <ProtectedRoute>
+                    <PatternTracker />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/prompted-journal"
+                element={
+                  <ProtectedRoute>
+                    <PromptedJournal />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Shared routes */}
-            <Route
-              path="/journal"
-              element={
-                <ProtectedRoute>
-                  <Journal />
-                </ProtectedRoute>
-              }
-            />
+              {/* Shared routes */}
+              <Route
+                path="/journal"
+                element={
+                  <ProtectedRoute>
+                    <Journal />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* 404 route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+              {/* 404 route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </AuthProvider>
 );
 
 export default App;
