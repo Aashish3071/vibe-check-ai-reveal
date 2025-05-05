@@ -20,6 +20,8 @@ import { HomePage } from "@/features/home/pages";
 
 // Auth Pages
 import { AuthPage } from "@/features/auth/pages";
+import { AuthCallback } from "@/features/auth/pages/AuthCallback";
+import { UpdatePasswordPage } from "@/features/auth/pages/UpdatePasswordPage";
 
 // Profile Pages
 import { Quiz, AvatarGenerator } from "@/features/profile/pages";
@@ -36,17 +38,9 @@ import {
 // Therapist Bestie Pages
 import { MoodCheckPage } from "@/features/therapist/pages";
 import { Journal } from "@/features/therapist/components";
-
-// Placeholder components for remaining therapist mode features
-const SelfCoaching = () => (
-  <div className="p-4">Self Coaching (Coming Soon)</div>
-);
-const PatternTracker = () => (
-  <div className="p-4">Pattern Tracker (Coming Soon)</div>
-);
-const PromptedJournal = () => (
-  <div className="p-4">Prompted Journal (Coming Soon)</div>
-);
+import { SelfCoachingPage } from "@/features/therapist/pages/SelfCoachingPage";
+import { PatternTrackerPage } from "@/features/therapist/pages/PatternTrackerPage";
+import { PromptedJournalPage } from "@/features/therapist/pages/PromptedJournalPage";
 
 const queryClient = new QueryClient();
 
@@ -274,7 +268,7 @@ const App = () => (
                 path="/self-coaching"
                 element={
                   <ProtectedRoute>
-                    <SelfCoaching />
+                    <SelfCoachingPage />
                   </ProtectedRoute>
                 }
               />
@@ -282,7 +276,7 @@ const App = () => (
                 path="/pattern-tracker"
                 element={
                   <ProtectedRoute>
-                    <PatternTracker />
+                    <PatternTrackerPage />
                   </ProtectedRoute>
                 }
               />
@@ -290,7 +284,7 @@ const App = () => (
                 path="/prompted-journal"
                 element={
                   <ProtectedRoute>
-                    <PromptedJournal />
+                    <PromptedJournalPage />
                   </ProtectedRoute>
                 }
               />
@@ -303,6 +297,14 @@ const App = () => (
                     <Journal />
                   </ProtectedRoute>
                 }
+              />
+
+              {/* Auth callback routes */}
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/auth/reset-password" element={<AuthCallback />} />
+              <Route
+                path="/auth/update-password"
+                element={<UpdatePasswordPage />}
               />
 
               {/* 404 route */}

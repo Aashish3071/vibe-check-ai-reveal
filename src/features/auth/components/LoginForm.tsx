@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
@@ -8,9 +7,10 @@ import { useAuth } from "@/common/lib/auth";
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
+  onForgotPassword: () => void;
 }
 
-const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
+const LoginForm = ({ onSwitchToSignup, onForgotPassword }: LoginFormProps) => {
   const { login, isPending, error } = useAuth();
   const [loginData, setLoginData] = useState({
     username: "",
@@ -50,7 +50,17 @@ const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Password</Label>
+          <Button
+            type="button"
+            variant="link"
+            className="text-xs text-muted-foreground px-0"
+            onClick={onForgotPassword}
+          >
+            Forgot Password?
+          </Button>
+        </div>
         <Input
           id="password"
           type="password"

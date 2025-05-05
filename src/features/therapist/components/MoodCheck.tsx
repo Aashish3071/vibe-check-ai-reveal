@@ -108,11 +108,9 @@ const MoodCheck = () => {
         <Card className="border-green-100 dark:border-green-900/30 shadow-lg">
           <CardHeader>
             <CardTitle className="text-lg">Mood Check-in</CardTitle>
-            <CardDescription>
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span>{new Date().toLocaleDateString()}</span>
-              </div>
+            <CardDescription className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span>{new Date().toLocaleDateString()}</span>
             </CardDescription>
           </CardHeader>
           <CardContent>

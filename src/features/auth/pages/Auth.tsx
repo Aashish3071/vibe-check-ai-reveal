@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/common/lib/auth";
@@ -18,6 +17,7 @@ import {
 import { Button } from "@/common/components/ui/button";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
+import { SocialAuth } from "../components/SocialAuth";
 import Sparkles from "@/common/components/Sparkles";
 
 const Auth = () => {
@@ -57,11 +57,20 @@ const Auth = () => {
             </TabsList>
 
             <TabsContent value="login">
-              <LoginForm onSwitchToSignup={() => setActiveTab("signup")} />
+              <LoginForm
+                onSwitchToSignup={() => setActiveTab("signup")}
+                onForgotPassword={() => navigate("/auth/reset-password")}
+              />
+              <div className="mt-4">
+                <SocialAuth />
+              </div>
             </TabsContent>
 
             <TabsContent value="signup">
               <SignupForm onSwitchToLogin={() => setActiveTab("login")} />
+              <div className="mt-4">
+                <SocialAuth />
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
