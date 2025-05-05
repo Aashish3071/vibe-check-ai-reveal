@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@/common/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { vi } from "vitest";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,6 +12,25 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Mock window and document objects for tests
+const mockWindow = {
+  history: {
+    pushState: vi.fn(),
+  },
+  document: {
+    createElement: vi.fn(),
+    getElementById: vi.fn(),
+    querySelector: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  },
+};
+
+// @ts-expect-error - Mocking window and document objects for tests
+global.window = mockWindow;
+// @ts-expect-error - Mocking window and document objects for tests
+global.document = mockWindow.document;
 
 export function render(ui: React.ReactElement, { route = "/" } = {}) {
   window.history.pushState({}, "Test page", route);

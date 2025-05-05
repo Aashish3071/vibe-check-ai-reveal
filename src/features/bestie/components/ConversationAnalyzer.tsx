@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/common/components/ui/button";
 import { Textarea } from "@/common/components/ui/textarea";
@@ -32,12 +31,16 @@ import {
 } from "@/common/components/ui/dialog";
 import { useAuth } from "@/common/lib/auth";
 import { ConversationAnalysis } from "@/common/lib/api-types";
+import { ChatInput } from "@/features/chat/components/ChatInput";
+import { useOpenAI } from "@/common/hooks/useOpenAI";
 
 const ConversationAnalyzer = () => {
   const { user } = useAuth();
   const [conversation, setConversation] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [results, setResults] = useState<ConversationAnalysis | null>(null);
+  const [results, setResults] = useState<string | null>(null);
+
+  const { generateResponse, setModule } = useOpenAI();
 
   const handleAnalyze = async () => {
     if (!conversation.trim()) {
@@ -49,8 +52,10 @@ const ConversationAnalyzer = () => {
 
     try {
       // Cast the result to ConversationAnalysis since we know the structure matches
-      const analysis = await analyzeConversation(conversation);
-      setResults(analysis as ConversationAnalysis);
+      setModule("decode-vibe");
+      const analysis = await generateResponse(conversation);
+      console.log("Analysis result:", analysis);
+      setResults(analysis);
       toast.success("Vibe check complete! ✨", {
         description: "Got the tea on this situation",
       });
@@ -224,6 +229,7 @@ ${results.advice}
             placeholder="Paste your convo here... (like 'they said hey wyd and I waited 3 hrs to say nm u?')"
             className="dreamy-input min-h-[200px] text-sm mb-4"
           />
+          {/* <ChatInput /> */}
 
           <Button
             onClick={handleAnalyze}
@@ -238,11 +244,11 @@ ${results.advice}
           <ResultCard
             icon={MessageCircle}
             title="✨ Vibe Check"
-            content={results.sentiment}
+            content={results}
             color="bg-purple-500"
           />
 
-          <ResultCard
+          {/* <ResultCard
             icon={Eye}
             title="👁️ What's Their Deal"
             content={results.keyInsights.join("\n")}
@@ -263,7 +269,7 @@ ${results.advice}
             title="📱 My Next Move"
             content={results.advice}
             color="bg-blue-500"
-          />
+          /> */}
 
           <div className="flex gap-3">
             <Button

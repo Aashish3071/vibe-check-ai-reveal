@@ -2,18 +2,20 @@ import { supabase } from "@/common/lib/supabase";
 
 // Input sanitization
 export function sanitizeInput(input: string): string {
-  return input
-    .replace(/[<>]/g, "") // Remove HTML tags
-    .replace(/[&<>"']/g, (char) => {
-      const escape: Record<string, string> = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      };
-      return escape[char];
-    });
+  // First remove HTML tags
+  const withoutTags = input.replace(/<[^>]*>/g, "");
+
+  // Then escape special characters
+  return withoutTags.replace(/[&<>"']/g, (char) => {
+    const escape: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return escape[char];
+  });
 }
 
 // Password strength validation
@@ -96,14 +98,31 @@ export async function validateSession(): Promise<boolean> {
 
 // Secure headers
 export const secureHeaders = {
-  "Content-Security-Policy":
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;",
+  "Content-Security-Policy": `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' data: https:;
+    font-src 'self' data: https://fonts.gstatic.com;
+    connect-src 'self' https://*.supabase.co https://*.openai.com;
+    frame-src 'self' https://accounts.google.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+  `
+    .replace(/\s+/g, " ")
+    .trim(),
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "X-XSS-Protection": "1; mode=block",
-  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Embedder-Policy": "require-corp",
+  "Cross-Origin-Resource-Policy": "same-origin",
 };
 
 // Data encryption
@@ -140,3 +159,49 @@ export async function decryptData(encryptedData: string): Promise<string> {
   );
   return new TextDecoder().decode(decrypted);
 }
+
+// Request validation
+export function validateRequest(
+  request: Request,
+  allowedMethods: string[] = ["GET", "POST", "PUT", "DELETE"]
+): boolean {
+  const method = request.method.toUpperCase();
+  if (!allowedMethods.includes(method)) {
+    return false;
+  }
+
+  const contentType = request.headers.get("content-type");
+  if (method !== "GET" && contentType !== "application/json") {
+    return false;
+  }
+
+  return true;
+}
+
+// API key validation
+export function validateApiKey(apiKey: string): boolean {
+  const apiKeyPattern = /^[a-zA-Z0-9]{32,}$/;
+  return apiKeyPattern.test(apiKey);
+}
+
+// JWT validation
+export async function validateJWT(token: string): Promise<boolean> {
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
+    return !error && !!user;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Secure cookie options
+export const secureCookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "strict" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7, // 1 week
+};
